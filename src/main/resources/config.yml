@@ -18,12 +18,18 @@ database:
     type: 'sqlite'
     #mysql设置
     mysql:
-        ip: 'localhost'
-        port: '3306'
-        database: 'databasename'
-        user: 'username'
-        password: 'password'
-        ssl: false
+        address: 'localhost:3306'
+        username: miraimc
+        password: miraimc
+        database: miraimc
+        parameters: "?useSSL=false&serverTimezone=UTC&autoReconnect=true&allowPublicKeyRetrieval=true&characterEncoding=utf8"
+        pool:
+            connectionTimeout: 30000
+            idleTimeout: 600000
+            maxLifetime: 1800000
+            maximumPoolSize: 15
+            keepaliveTime: 0
+            minimumIdle: 5
     #sqlite设置
     sqlite:
         folder: '%PLUGIN_FOLDER%'

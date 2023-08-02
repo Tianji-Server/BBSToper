@@ -1,26 +1,29 @@
 package moe.feo.bbstoper.config;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.logging.Level;
-
 import com.google.common.base.Charsets;
 import moe.feo.bbstoper.BBSToper;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
 
 public enum Option {
 	DEBUG("debug"),
 	DATABASE_TYPE("database.type"),
 	DATABASE_PREFIX("database.prefix"),
 	DATABASE_TIMINGRECONNECT("timingreconnect"),
-	DATABASE_MYSQL_IP("database.mysql.ip"),
-	DATABASE_MYSQL_PORT("database.mysql.port"),
+	DATABASE_MYSQL_ADDRESS("database.mysql.address"),
 	DATABASE_MYSQL_DATABASE("database.mysql.database"),
-	DATABASE_MYSQL_USER("database.mysql.user"),
+	DATABASE_MYSQL_USERNAME("database.mysql.username"),
 	DATABASE_MYSQL_PASSWORD("database.mysql.password"),
-	DATABASE_MYSQL_SSL("database.mysql.ssl"),
+	DATABASE_MYSQL_PARAMETERS("database.mysql.parameters"),
+	DATABASE_POOL_CONNECTIONTIMEOUT("database.mysql.pool.connectionTimeout"),
+	DATABASE_POOL_IDLETIMEOUT("database.mysql.pool.idleTimeout"),
+	DATABASE_POOL_MAXLIFETIME("database.mysql.pool.maxLifetime"),
+	DATABASE_POOL_MAXIUMPOOLSIZE("database.mysql.pool.maximumPoolSize"),
+	DATABASE_POOL_KEEPALIVETIME("database.mysql.pool.keepaliveTime"),
+	DATABASE_POOL_MINIMUMIDLE("database.mysql.pool.minimumIdle"),
 	DATABASE_SQLITE_FOLDER("database.sqlite.folder"),
 	DATABASE_SQLITE_DATABASE("database.sqlite.database"),
 	MCBBS_LINK("mcbbs.link"),
@@ -77,5 +80,14 @@ public enum Option {
 
 	public int getInt() {
 		return BBSToper.INSTANCE.getConfig().getInt(path);
+	}
+
+	public long getLong() {
+		return BBSToper.INSTANCE.getConfig().getLong(path);
+	}
+
+	@Override
+	public String toString() {
+		return BBSToper.INSTANCE.getConfig().getString(path);
 	}
 }
