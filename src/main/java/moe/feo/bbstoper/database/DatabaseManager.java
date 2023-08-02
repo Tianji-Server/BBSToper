@@ -23,7 +23,8 @@ public class DatabaseManager {
 			}
 			connection.load();
 		} catch (Exception e) {
-			e.printStackTrace();
+			BBSToper.INSTANCE.getLogger().severe("Failed to initialize databse: " + e);
+			if(Option.DEBUG.getBoolean()) e.printStackTrace();
 		} finally {
 			AbstractSQLConnection.writelock.unlock();
 		}
