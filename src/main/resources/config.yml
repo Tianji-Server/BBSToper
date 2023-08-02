@@ -1,13 +1,6 @@
-#########################################
-#                                       #
-#       这里是BBSToper的配置文件        #
-#                                       #
-#########################################
-
-#项目地址: https://github.com/R-Josef/BBSToper
-#MCBBS下载地址: https://www.mcbbs.net/thread-789082-1-1.html
-#请定期检查这些网址以获取可用的更新
-#Copyright © 2018-2020 R_Josef 版权所有
+# BBSToper 配置文件
+# 原作者：R_Josef https://github.com/R-Josef/BBSToper
+# 重制版作者：DreamVoid
 
 #DEBUG模式
 debug: false
