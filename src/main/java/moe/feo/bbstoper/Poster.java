@@ -1,13 +1,10 @@
 package moe.feo.bbstoper;
 
+import moe.feo.bbstoper.database.DatabaseManager;
+
 import java.util.List;
 
-import moe.feo.bbstoper.sql.SQLer;
-
 public class Poster {
-
-	public static SQLer sql;
-
 	private String uuid = "";// 顶贴者的uuid
 	private String name = "";// 顶贴者id
 	private String bbsname = "";// 顶贴者bbs用户名
@@ -15,10 +12,6 @@ public class Poster {
 	private String rewardbefore = "";// 上一次获取奖励的时间
 	private int rewardtime = 0;// 上次一领取了多少奖励
 	private int count = 0;// 总计的顶贴次数 (不一定有数据)
-
-	public static void setSQLer(SQLer sql) {
-		Poster.sql = sql;
-	}
 
 	public String getUuid() {
 		return uuid;
@@ -77,7 +70,7 @@ public class Poster {
 	}
 
 	public List<String> getTopStates() {
-		return sql.getTopStatesFromPoster(this);
+		return DatabaseManager.connection.getTopStatesFromPoster(this);
 	}
 
 }

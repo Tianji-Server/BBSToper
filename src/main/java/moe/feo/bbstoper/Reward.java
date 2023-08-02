@@ -1,5 +1,10 @@
 package moe.feo.bbstoper;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,11 +12,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 public class Reward {
 	private final Player player; // 发放奖励的对象
@@ -82,27 +82,21 @@ public class Reward {
 	public boolean isIntervalTooShort(Calendar thispost, int index) {// 判断顶贴间隔是否过短
 		SimpleDateFormat bbsformat = new SimpleDateFormat("yyyy-M-d HH:mm");// mcbbs的日期格式
 		Date thispostdate = thispost.getTime();
-		int x = index + 1;// 从下一个顶贴记录开始遍历
-		while (true) {
-			Date lastdate = null;
-			// 当记录已经全部遍历完，就不用再继续了
-			if (x >= crawler.Time.size()) {
-				break;
-			}
+		for(int x = index + 1; x< crawler.Time.size(); x++){
 			try {
-				lastdate = bbsformat.parse(crawler.Time.get(x));
+				Date lastDate = bbsformat.parse(crawler.Time.get(x));
+				// 遍历再上一次的顶贴时间
+				// 当这次遍历到的时间减去当前领奖的时间已经大于设定的时间了，就不用继续遍历了
+				if ((thispostdate.getTime() - lastDate.getTime()) / (1000 * 60) > Option.REWARD_INTERVAL.getInt()) {
+					break;
+				}
+				// 当遍历到和这次领奖记录的bbsid一样的记录，说明这个人顶贴间隔小于设定时间了
+				if (crawler.ID.get(x).equals(crawler.ID.get(index))) {
+					return true;
+				}
 			} catch (ParseException e) {
 				e.printStackTrace();
-			} // 遍历再上一次的顶贴时间
-			// 当这次遍历到的时间减去当前领奖的时间已经大于设定的时间了，就不用继续遍历了
-			if ((thispostdate.getTime() - lastdate.getTime()) / (1000 * 60) > Option.REWARD_INTERVAL.getInt()) {
-				break;
 			}
-			// 当遍历到和这次领奖记录的bbsid一样的记录，说明这个人顶贴间隔小于设定时间了
-			if (crawler.ID.get(x).equals(crawler.ID.get(index))) {
-				return true;
-			}
-			x++;
 		}
 		return false;
 	}

@@ -1,13 +1,8 @@
 package moe.feo.bbstoper;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
 import moe.feo.bbstoper.config.Message;
 import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -15,12 +10,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import moe.feo.bbstoper.sql.SQLer;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 public class Reminder implements Listener {
-
-	private static SQLer sql;
-
 	public Reminder(Plugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
@@ -42,7 +38,7 @@ public class Reminder implements Listener {
 				boolean isbinded = true;// 是否绑定
 				boolean isposted = true;// 是否有顶贴者
 				UUID uuid = event.getPlayer().getUniqueId();
-				Poster poster = sql.getPoster(uuid.toString());
+				Poster poster = DatabaseManager.connection.getPoster(uuid.toString());
 				String datenow = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 				if (poster == null) {// 玩家未绑定
 					isbinded = false;
@@ -68,9 +64,5 @@ public class Reminder implements Listener {
 				}
 			}
 		}.runTaskAsynchronously(BBSToper.INSTANCE);
-	}
-
-	public static void setSQLer(SQLer sql) {
-		Reminder.sql = sql;
 	}
 }

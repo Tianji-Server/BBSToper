@@ -1,4 +1,4 @@
-package moe.feo.bbstoper.sql;
+package moe.feo.bbstoper.database;
 
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.config.Message;
@@ -11,29 +11,25 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class SQLiter extends SQLer {
+public class SQLite extends AbstractSQLConnection {
 
-	private final static SQLiter sqler = new SQLiter();
-	private Connection conn;
+	private final static SQLite sqler = new SQLite();
+	private Connection connection;
 
-	private SQLiter() {
-
-	}
-
-	public static SQLiter getInstance() {
+	public static SQLite getInstance() {
 		return sqler;
 	}
 
 	@Override
 	protected Connection getConnection() {
-		return this.conn;
+		return this.connection;
 	}
 
 	@Override
 	protected void closeConnection() {
 		try {
-			if (!conn.isClosed()) {// 如果连接没有关闭，则将关闭这个连接
-				conn.close();
+			if (!connection.isClosed()) {// 如果连接没有关闭，则将关闭这个连接
+				connection.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -58,7 +54,7 @@ public class SQLiter extends SQLer {
 		String driver = "org.sqlite.JDBC";
 		try {
 			Class.forName(driver);
-			this.conn = DriverManager.getConnection(getUrl());
+			this.connection = DriverManager.getConnection(getUrl());
 		} catch (ClassNotFoundException | SQLException e) {
 			BBSToper.INSTANCE.getLogger().log(Level.WARNING, Message.FAILEDCONNECTSQL.getString(), e);
 		}
@@ -68,7 +64,7 @@ public class SQLiter extends SQLer {
 		String sql = String.format(
 				"CREATE TABLE IF NOT EXISTS `%s` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) );",
 				getTableName("posters"));
-		try (Statement stmt = conn.createStatement()) {
+		try (Statement stmt = connection.createStatement()) {
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -79,7 +75,7 @@ public class SQLiter extends SQLer {
 		String sql = String.format(
 				"CREATE TABLE IF NOT EXISTS `%s` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `time` varchar(16) NOT NULL);",
 				getTableName("topstates"));
-		try (Statement stmt = conn.createStatement()) {
+		try (Statement stmt = connection.createStatement()) {
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();

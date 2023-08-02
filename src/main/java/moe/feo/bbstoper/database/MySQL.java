@@ -1,4 +1,4 @@
-package moe.feo.bbstoper.sql;
+package moe.feo.bbstoper.database;
 
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.config.Message;
@@ -10,29 +10,25 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class MySQLer extends SQLer {
+public class MySQL extends AbstractSQLConnection {
 
-	private final static MySQLer sqler = new MySQLer();
-	private Connection conn;
+	private final static MySQL sqler = new MySQL();
+	private Connection connection;
 
-	private MySQLer() {
-
-	}
-
-	public static MySQLer getInstance() {
+	public static MySQL getInstance() {
 		return sqler;
 	}
 
 	@Override
 	protected Connection getConnection() {
-		return this.conn;
+		return this.connection;
 	}
 
 	@Override
 	protected void closeConnection() {
 		try {
-			if (!conn.isClosed()) {// 如果连接没有关闭，则将关闭这个连接
-				conn.close();
+			if (!connection.isClosed()) {// 如果连接没有关闭，则将关闭这个连接
+				connection.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -59,7 +55,7 @@ public class MySQLer extends SQLer {
 		String password = Option.DATABASE_MYSQL_PASSWORD.getString();
 		try {
 			Class.forName(driver);
-			this.conn = DriverManager.getConnection(getUrl(), user, password);
+			this.connection = DriverManager.getConnection(getUrl(), user, password);
 		} catch (ClassNotFoundException | SQLException e) {
 			BBSToper.INSTANCE.getLogger().log(Level.WARNING, Message.FAILEDCONNECTSQL.getString(), e);
 		}
@@ -69,7 +65,7 @@ public class MySQLer extends SQLer {
 		String sql = String.format(
 				"CREATE TABLE IF NOT EXISTS `%s` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;",
 				getTableName("posters"));
-		try (Statement stmt = conn.createStatement()) {
+		try (Statement stmt = connection.createStatement()) {
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -80,11 +76,10 @@ public class MySQLer extends SQLer {
 		String sql = String.format(
 				"CREATE TABLE IF NOT EXISTS `%s` ( `id` int(0) NOT NULL AUTO_INCREMENT, `bbsname` varchar(255) NOT NULL, `time` varchar(16) NOT NULL, PRIMARY KEY (`id`) ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;",
 				getTableName("topstates"));
-		try (Statement stmt = conn.createStatement()) {
+		try (Statement stmt = connection.createStatement()) {
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -1,5 +1,10 @@
 package moe.feo.bbstoper;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,31 +12,25 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
-import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-
 public class Util {
-
-	private static BukkitTask autorewardtask;
-	private static final ArrayList<Integer> runningtaskidlist = new ArrayList<>();
+	private static BukkitTask autoRewardTask;
+	private static final ArrayList<Integer> runningTaskIdList = new ArrayList<>();
 
 	public static void startAutoReward() {// 自动奖励的方法
-		if (autorewardtask != null) {// 任务对象不为空
-			boolean taskcancelled;// 是否已经取消
+		if (autoRewardTask != null) {// 任务对象不为空
+			boolean taskCancelled;// 是否已经取消
 			try {
-				taskcancelled = autorewardtask.isCancelled();
+				taskCancelled = autoRewardTask.isCancelled();
 			} catch (NoSuchMethodError e) {// 1.7.10还没有这个方法
-				taskcancelled = false;// 默认就当这个任务没有取消
+				taskCancelled = false;// 默认就当这个任务没有取消
 			}
-			if (!taskcancelled) {// 如果任务还被取消
-				autorewardtask.cancel();// 将之前的任务取消
+			if (!taskCancelled) {// 如果任务还被取消
+				autoRewardTask.cancel();// 将之前的任务取消
 			}
 		}
 		int period = Option.REWARD_AUTO.getInt() * 20;
 		if (period > 0) {
-			autorewardtask = new BukkitRunnable() {// 自动奖励，异步执行
+			autoRewardTask = new BukkitRunnable() {// 自动奖励，异步执行
 				@Override
 				public void run() {
 					addRunningTaskID(this.getTaskId());
@@ -52,7 +51,7 @@ public class Util {
 	public static void waitForAllTask() {// 此方法会阻塞直到所有此插件创建的线程结束
 		int count = 0;
 		try {
-			while (!runningtaskidlist.isEmpty()) {// 当list非空，阻塞线程100毫秒后再判断一次
+			while (!runningTaskIdList.isEmpty()) {// 当list非空，阻塞线程100毫秒后再判断一次
 				if (count > 30000) {// 超过30秒没有关闭就算超时
 					throw new TimeoutException();
 				}
@@ -65,13 +64,13 @@ public class Util {
 	}
 
 	public static void addRunningTaskID(int i) {
-		if (!runningtaskidlist.contains(i))
-			runningtaskidlist.add(i);
+		if (!runningTaskIdList.contains(i))
+			runningTaskIdList.add(i);
 	}
 
 	public static void removeRunningTaskID(int i) {
-		if (runningtaskidlist.contains(i))
-			runningtaskidlist.remove((Integer) i);
+		if (runningTaskIdList.contains(i))
+			runningTaskIdList.remove((Integer) i);
 	}
 	
 	public static String getExtraReward(Crawler crawler) {// 获取会获得的额外奖励(可为空)
@@ -81,13 +80,12 @@ public class Util {
 		Calendar lastpost = Calendar.getInstance();// 上一次顶贴的时间
 		if (crawler.Time.size() > 0) {// 如果有顶贴记录的话
 			SimpleDateFormat bbsformat = new SimpleDateFormat("yyyy-M-d HH:mm");// mcbbs的日期格式
-			Date lastpostdate = null;
 			try {
-				lastpostdate = bbsformat.parse(crawler.Time.get(0));
+				Date lastpostdate = bbsformat.parse(crawler.Time.get(0));
+				lastpost.setTime(lastpostdate);
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-			lastpost.setTime(lastpostdate);
 		}
 		if (Reward.canIncentiveReward(current, lastpost)) {
 			incentive = true;

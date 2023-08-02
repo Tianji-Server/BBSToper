@@ -1,4 +1,4 @@
-package moe.feo.bbstoper.sql;
+package moe.feo.bbstoper.database;
 
 import moe.feo.bbstoper.config.Option;
 import moe.feo.bbstoper.Poster;
@@ -12,7 +12,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public abstract class SQLer {
+public abstract class AbstractSQLConnection {
 	
 	public static final ReadWriteLock lock = new ReentrantReadWriteLock();
 	public static final Lock readlock = lock.readLock();

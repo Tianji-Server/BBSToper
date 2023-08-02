@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import moe.feo.bbstoper.config.Message;
 import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -20,12 +21,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import moe.feo.bbstoper.gui.GUI;
 import moe.feo.bbstoper.gui.IDListener;
-import moe.feo.bbstoper.sql.SQLManager;
-import moe.feo.bbstoper.sql.SQLer;
 
 public class CLI implements TabExecutor {
-
-	private static SQLer sql;
 	private final Map<String, String> cache = new HashMap<>();// 这个map是为了暂存玩家的绑定信息的
 	private final Map<UUID, Long> queryrecord = new HashMap<>();// 这个map是用于储存玩家上次查询顶贴记录的时间
 
@@ -146,7 +143,7 @@ public class CLI implements TabExecutor {
 					if (args.length == 2) {
 						Player player = Bukkit.getPlayer(sender.getName());
 						String uuid = player.getUniqueId().toString();
-						Poster poster = sql.getPoster(uuid);
+						Poster poster = DatabaseManager.connection.getPoster(uuid);
 						boolean isrecording = true;
 						if (poster != null) {
 							long cd = System.currentTimeMillis() - poster.getBinddate();// 已经过了的cd
@@ -163,7 +160,7 @@ public class CLI implements TabExecutor {
 							poster = new Poster();
 							isrecording = false;
 						}
-						String ownersuuid = sql.bbsNameCheck(args[1]);
+						String ownersuuid = DatabaseManager.connection.bbsNameCheck(args[1]);
 						if (ownersuuid == null) {// 没有人绑定过这个论坛id
 							if (cache.get(uuid) != null && cache.get(uuid).equals(args[1])) {
 								poster.setUuid(uuid);
@@ -171,9 +168,9 @@ public class CLI implements TabExecutor {
 								poster.setBbsname(args[1]);
 								poster.setBinddate(System.currentTimeMillis());
 								if (isrecording) {
-									sql.updatePoster(poster);
+									DatabaseManager.connection.updatePoster(poster);
 								} else {
-									sql.addPoster(poster);
+									DatabaseManager.connection.addPoster(poster);
 								}
 								cache.put(uuid, null);// 绑定成功, 清理这个键
 								sender.sendMessage(Message.PREFIX.getString() + Message.BINDINGSUCCESS.getString());
@@ -215,7 +212,7 @@ public class CLI implements TabExecutor {
 					}
 					Player player = Bukkit.getPlayer(sender.getName());
 					String uuid = player.getUniqueId().toString();
-					Poster poster = sql.getPoster(uuid);
+					Poster poster = DatabaseManager.connection.getPoster(uuid);
 					if (poster == null) {// 没有绑定
 						sender.sendMessage(Message.PREFIX.getString() + Message.NOTBOUND.getString());
 						sender.sendMessage(Message.PREFIX.getString() + Message.HELP_BINDING.getString());
@@ -265,7 +262,7 @@ public class CLI implements TabExecutor {
 								}
 								if (poster.getRewardtime() < Option.REWARD_TIMES.getInt()) {// 奖励次数小于设定值
 									new Reward((Player) sender, crawler, i).award();
-									sql.addTopState(poster.getBbsname(), crawler.Time.get(i));
+									DatabaseManager.connection.addTopState(poster.getBbsname(), crawler.Time.get(i));
 									poster.setRewardtime(poster.getRewardtime() + 1);// rewardtime次数加一
 									issucceed = true;
 								} else {
@@ -274,7 +271,7 @@ public class CLI implements TabExecutor {
 							}
 						}
 					}
-					sql.updatePoster(poster);// 更新poster
+					DatabaseManager.connection.updatePoster(poster);// 更新poster
 					if (issucceed) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.REWARDGIVED.getString());
 						for (Player p :Bukkit.getOnlinePlayers()) {// 给有奖励权限且能看见此玩家(防止Vanish)的玩家广播
@@ -432,8 +429,8 @@ public class CLI implements TabExecutor {
 						sender.sendMessage(Message.PREFIX.getString() + Message.HELP_TOP.getString());
 						return;
 					}
-					List<Poster> posterlist = sql.getTopPosters();
-					posterlist.addAll(sql.getNoCountPosters());
+					List<Poster> posterlist = DatabaseManager.connection.getTopPosters();
+					posterlist.addAll(DatabaseManager.connection.getNoCountPosters());
 					int totalpage = (int) Math.ceil((double) posterlist.size() / Option.MCBBS_PAGESIZE.getInt());
 					if (page > totalpage) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.OVERPAGE.getString());
@@ -469,8 +466,8 @@ public class CLI implements TabExecutor {
 					BBSToper.INSTANCE.saveDefaultConfig();
 					Option.load();
 					Message.load();
-					SQLManager.initializeSQLer();
-					SQLManager.startTimingReconnect();
+					DatabaseManager.initializeDatabase();
+					DatabaseManager.startTimingReconnect();
 					Util.startAutoReward();
 					sender.sendMessage(Message.PREFIX.getString() + Message.RELOAD.getString());
 					break;
@@ -487,7 +484,7 @@ public class CLI implements TabExecutor {
 					}
 					switch (args[1].toLowerCase()) {
 					case "bbsid": {
-						String owneruuid = sql.bbsNameCheck(args[2]);
+						String owneruuid = DatabaseManager.connection.bbsNameCheck(args[2]);
 						if (owneruuid == null) {
 							sender.sendMessage(Message.PREFIX.getString() + Message.IDNOTFOUND.getString());
 							return;
@@ -501,7 +498,7 @@ public class CLI implements TabExecutor {
 					case "player": {
 						@SuppressWarnings("deprecation")
 						UUID owneruuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
-						Poster poster = sql.getPoster(owneruuid.toString());
+						Poster poster = DatabaseManager.connection.getPoster(owneruuid.toString());
 						if (poster == null) {
 							sender.sendMessage(Message.PREFIX.getString() + Message.OWNERNOTFOUND.getString());
 							return;
@@ -525,12 +522,12 @@ public class CLI implements TabExecutor {
 					}
 					@SuppressWarnings("deprecation")
 					UUID uuid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-					Poster poster = sql.getPoster(uuid.toString());
+					Poster poster = DatabaseManager.connection.getPoster(uuid.toString());
 					if (poster == null) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.OWNERNOTFOUND.getString());
 						return;
 					}
-					sql.deletePoster(uuid.toString());
+					DatabaseManager.connection.deletePoster(uuid.toString());
 					sender.sendMessage(Message.PREFIX.getString() + Message.DELETESUCCESS.getString());
 					return;
 				}
@@ -542,10 +539,6 @@ public class CLI implements TabExecutor {
 			}
 		}.runTaskAsynchronously(BBSToper.INSTANCE);
 		return true;
-	}
-
-	public static void setSQLer(SQLer sql) {
-		CLI.sql = sql;
 	}
 
 	public Map<String, String> getCache() {

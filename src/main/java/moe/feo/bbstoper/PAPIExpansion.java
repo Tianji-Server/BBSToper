@@ -1,19 +1,15 @@
 package moe.feo.bbstoper;
 
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.database.DatabaseManager;
+import org.bukkit.entity.Player;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
-import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
-import org.bukkit.entity.Player;
-
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import moe.feo.bbstoper.sql.SQLer;
-
 public class PAPIExpansion extends PlaceholderExpansion {
-
-	private static SQLer sql;
-
 	private final String author;
 	private final String identifier;
 	private final String version;
@@ -22,10 +18,6 @@ public class PAPIExpansion extends PlaceholderExpansion {
 		this.author = BBSToper.INSTANCE.getDescription().getAuthors().toString();
 		this.identifier = BBSToper.INSTANCE.getDescription().getName().toLowerCase();
 		this.version = BBSToper.INSTANCE.getDescription().getVersion();
-	}
-
-	public static void setSQLer(SQLer sql) {
-		PAPIExpansion.sql = sql;
 	}
 
 	// 因为是插件包含的类, PAPI不能重载这个拓展
@@ -60,7 +52,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 	public String onPlaceholderRequest(Player player, String identifier) {
 		Poster poster;
 		if (player != null) {// 有玩家
-			poster = sql.getPoster(player.getUniqueId().toString());
+			poster = DatabaseManager.connection.getPoster(player.getUniqueId().toString());
 			if (identifier.equals("bbsid")) {// BBS用户名
 				if (poster == null) {
 					return Message.GUI_NOTBOUND.getString();
@@ -105,7 +97,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 		if (Pattern.matches(pattern, identifier)) {// 如果匹配这种格式
 			int rank = Integer.parseInt(identifier.split("_")[1]);
 			int index = rank - 1;
-			List<Poster> listposter = sql.getTopPosters();
+			List<Poster> listposter = DatabaseManager.connection.getTopPosters();
 			if (index < listposter.size()) {
 				return Message.POSTERPLAYER.getString() + ":" + listposter.get(index).getName() + " "
 						+ Message.POSTERID.getString() + ":" + listposter.get(index).getBbsname() + " "
