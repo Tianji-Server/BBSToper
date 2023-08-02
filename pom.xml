@@ -97,6 +97,10 @@
 									<pattern>org.jsoup</pattern>
 									<shadedPattern>moe.feo.jsoup</shadedPattern>
 								</relocation>
+								<relocation>
+									<pattern>com.zaxxer.hikari</pattern>
+									<shadedPattern>moe.feo.hikaricp</shadedPattern>
+								</relocation>
 							</relocations>
 							<minimizeJar>true</minimizeJar>
 							<artifactSet>
