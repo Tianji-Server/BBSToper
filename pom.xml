@@ -63,20 +63,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<sourceDirectory>src/</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>resources</directory>
-			</resource>
-			<resource>
-				<directory>${project.basedir}</directory>
-				<includes>
-					<include>LICENSE</include>
-					<include>README.md</include>
-				</includes>
-				<targetPath>META-INF</targetPath>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

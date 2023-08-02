@@ -12,9 +12,9 @@ public class PAPIExpansion extends PlaceholderExpansion {
 
 	private static SQLer sql;
 
-	private String author;
-	private String identifier;
-	private String version;
+	private final String author;
+	private final String identifier;
+	private final String version;
 
 	PAPIExpansion() {
 		this.author = BBSToper.getInstance().getDescription().getAuthors().toString();

@@ -4,23 +4,22 @@ import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.Message;
 import moe.feo.bbstoper.Option;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class SQLiter extends SQLer {
+public class MySQLer extends SQLer {
 
-	private final static SQLiter sqler = new SQLiter();
+	private final static MySQLer sqler = new MySQLer();
 	private Connection conn;
 
-	private SQLiter() {
+	private MySQLer() {
 
 	}
 
-	public static SQLiter getInstance() {
+	public static MySQLer getInstance() {
 		return sqler;
 	}
 
@@ -41,11 +40,10 @@ public class SQLiter extends SQLer {
 	}
 
 	public String getUrl() {// 获取数据库url
-		String folder = BBSToper.getInstance().getDataFolder().getPath();// 获取插件文件夹
-		String path = Option.DATABASE_SQLITE_FOLDER.getString().replaceAll("%PLUGIN_FOLDER%", "%s");
-		String url = "jdbc:sqlite:" + path + File.separator + Option.DATABASE_SQLITE_DATABASE.getString();
-		String finalurl = String.format(url, folder);// 替换占位符
-		return finalurl;
+		boolean ssl = Option.DATABASE_MYSQL_SSL.getBoolean();
+		return "jdbc:mysql://" + Option.DATABASE_MYSQL_IP.getString() + ":"
+				+ Option.DATABASE_MYSQL_PORT.getString() + "/" + Option.DATABASE_MYSQL_DATABASE.getString() + "?useSSL="
+				+ ssl + "&serverTimezone=UTC" + "&autoReconnect=true" + "&allowPublicKeyRetrieval=true" + "&characterEncoding=utf8";
 	}
 
 	@Override
@@ -56,10 +54,12 @@ public class SQLiter extends SQLer {
 	}
 
 	protected void connect() {
-		String driver = "org.sqlite.JDBC";
+		String driver = "com.mysql.jdbc.Driver";
+		String user = Option.DATABASE_MYSQL_USER.getString();
+		String password = Option.DATABASE_MYSQL_PASSWORD.getString();
 		try {
 			Class.forName(driver);
-			this.conn = DriverManager.getConnection(getUrl());
+			this.conn = DriverManager.getConnection(getUrl(), user, password);
 		} catch (ClassNotFoundException | SQLException e) {
 			BBSToper.getInstance().getLogger().log(Level.WARNING, Message.FAILEDCONNECTSQL.getString(), e);
 		}
@@ -67,9 +67,9 @@ public class SQLiter extends SQLer {
 
 	protected void createTablePosters() {
 		String sql = String.format(
-				"CREATE TABLE IF NOT EXISTS `%s` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) );",
+				"CREATE TABLE IF NOT EXISTS `%s` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;",
 				getTableName("posters"));
-		try (Statement stmt = conn.createStatement();) {
+		try (Statement stmt = conn.createStatement()) {
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -78,9 +78,9 @@ public class SQLiter extends SQLer {
 
 	protected void createTableTopStates() {
 		String sql = String.format(
-				"CREATE TABLE IF NOT EXISTS `%s` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `time` varchar(16) NOT NULL);",
+				"CREATE TABLE IF NOT EXISTS `%s` ( `id` int(0) NOT NULL AUTO_INCREMENT, `bbsname` varchar(255) NOT NULL, `time` varchar(16) NOT NULL, PRIMARY KEY (`id`) ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;",
 				getTableName("topstates"));
-		try (Statement stmt = conn.createStatement();) {
+		try (Statement stmt = conn.createStatement()) {
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();

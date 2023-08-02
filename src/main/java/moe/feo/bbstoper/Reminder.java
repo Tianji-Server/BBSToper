@@ -49,8 +49,8 @@ public class Reminder implements Listener {
 					isposted = false;
 				}
 				if (!isposted) {// 没有顶贴
-					List<String> list = new ArrayList<String>();// 提示的信息
-					list.addAll(Message.INFO.getStringList());
+					// 提示的信息
+					List<String> list = new ArrayList<>(Message.INFO.getStringList());
 					Crawler crawler = new Crawler();
 					String extra = Util.getExtraReward(crawler);
 					if (extra != null) {// 说明有额外奖励信息

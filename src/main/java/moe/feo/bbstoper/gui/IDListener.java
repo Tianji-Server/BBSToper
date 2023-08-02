@@ -38,7 +38,7 @@ public class IDListener extends RegisteredListener implements Listener, EventExe
 	public static final Object lock = new Object(); // 线程锁
 	public static final Map<UUID, IDListener> map = new HashMap<>();
 
-	private UUID uid;
+	private final UUID uid;
 	private boolean state;
 
 	@Override
@@ -47,7 +47,7 @@ public class IDListener extends RegisteredListener implements Listener, EventExe
 	}
 
 	@Override
-	public void callEvent(Event event) throws EventException {
+	public void callEvent(Event event) {
 		if (event instanceof AsyncPlayerChatEvent) {
 			onPlayerChat((AsyncPlayerChatEvent) event);
 		}

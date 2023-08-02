@@ -27,7 +27,7 @@ public abstract class SQLer {
 		String sql = String.format(
 				"INSERT INTO `%s` (`uuid`, `name`, `bbsname`, `binddate`, `rewardbefore`, `rewardtimes`) VALUES (?, ?, ?, ?, ?, ?);",
 				getTableName("posters"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);) {
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
 			pstmt.setString(1, poster.getUuid());
 			pstmt.setString(2, poster.getName());
 			pstmt.setString(3, poster.getBbsname());
@@ -47,7 +47,7 @@ public abstract class SQLer {
 		String sql = String.format(
 				"UPDATE `%s` SET `name`=?, `bbsname`=?, `binddate`=?, `rewardbefore`=?, `rewardtimes`=? WHERE `uuid`=?;",
 				getTableName("posters"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);) {
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
 			pstmt.setString(1, poster.getName());
 			pstmt.setString(2, poster.getBbsname());
 			pstmt.setLong(3, poster.getBinddate());
@@ -65,7 +65,7 @@ public abstract class SQLer {
 	public void addTopState(String mcbbsname, String time) { // 记录一个顶贴
 		readlock.lock();
 		String sql = String.format("INSERT INTO `%s` (`bbsname`, `time`) VALUES (?, ?);", getTableName("topstates"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);) {
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
 			pstmt.setString(1, mcbbsname);
 			pstmt.setString(2, time);
 			pstmt.executeUpdate();
@@ -80,13 +80,13 @@ public abstract class SQLer {
 		readlock.lock();
 		String sql = String.format("SELECT * from `%s` WHERE `uuid`=?;", getTableName("posters"));
 		Poster poster = null;
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);) {
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
 			pstmt.setString(1, uuid);
-			try (ResultSet rs = pstmt.executeQuery();) {
+			try (ResultSet rs = pstmt.executeQuery()) {
 				try {
 					if (rs.isClosed())
 						return poster;
-				} catch (AbstractMethodError e) {
+				} catch (AbstractMethodError ignored) {
 				}
 
 				if (rs.next()) {
@@ -109,15 +109,15 @@ public abstract class SQLer {
 
 	public List<String> getTopStatesFromPoster(Poster poster) {// 返回一个顶贴者的顶贴列表
 		readlock.lock();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		String sql = String.format("SELECT `time` from `%s` WHERE `bbsname`=?;", getTableName("topstates"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);) {
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
 			pstmt.setString(1, poster.getBbsname());
-			try (ResultSet rs = pstmt.executeQuery();) {
+			try (ResultSet rs = pstmt.executeQuery()) {
 				try {
 					if (rs.isClosed())
 						return list;
-				} catch (AbstractMethodError e) {
+				} catch (AbstractMethodError ignored) {
 				}
 
 				while (rs.next()) {
@@ -136,9 +136,9 @@ public abstract class SQLer {
 		readlock.lock();
 		String sql = String.format("SELECT `uuid` from `%s` WHERE `bbsname`=?;", getTableName("posters"));
 		String uuid = null;
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);) {
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
 			pstmt.setString(1, bbsname);
-			try (ResultSet rs = pstmt.executeQuery();) {
+			try (ResultSet rs = pstmt.executeQuery()) {
 				try {
 					if (rs.isClosed())// 如果查询是空的sqlite就会把结果关闭
 						return uuid;
@@ -161,7 +161,7 @@ public abstract class SQLer {
 		readlock.lock();
 		String sql = String.format("SELECT * FROM `%s` WHERE `bbsname`=? AND `time`=? LIMIT 1;",
 				getTableName("topstates"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);) {
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
 			pstmt.setString(1, bbsname);
 			pstmt.setString(2, time);
 			try (ResultSet rs = pstmt.executeQuery()) {
@@ -188,9 +188,9 @@ public abstract class SQLer {
 		readlock.lock();
 		String sql = String.format("SELECT bbsname,COUNT(*) FROM `%s` GROUP BY bbsname ORDER BY COUNT(*) DESC;",
 				getTableName("topstates"));
-		List<Poster> list = new ArrayList<Poster>();
+		List<Poster> list = new ArrayList<>();
 		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);
-			 ResultSet rs = pstmt.executeQuery();) {
+			 ResultSet rs = pstmt.executeQuery()) {
 
 			while (rs.next()) {
 				String uuid = bbsNameCheck(rs.getString("bbsname"));
@@ -211,9 +211,9 @@ public abstract class SQLer {
 	public List<Poster> getNoCountPosters() {// 由于上面的方法只会返回有顶贴的玩家
 		readlock.lock();
 		String sql = String.format("SELECT * FROM `%s` WHERE `rewardbefore`='';", getTableName("posters"));
-		List<Poster> posterlist = new ArrayList<Poster>();
+		List<Poster> posterlist = new ArrayList<>();
 		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);
-			 ResultSet rs = pstmt.executeQuery();) {
+			 ResultSet rs = pstmt.executeQuery()) {
 			while (rs.next()) {
 				Poster poster = new Poster();
 				poster.setUuid(rs.getString("uuid"));
@@ -237,7 +237,7 @@ public abstract class SQLer {
 	public void deletePoster(String uuid) {
 		readlock.lock();
 		String sql = String.format("DELETE FROM `%s` WHERE `uuid`=?;", getTableName("posters"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);
+		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)
 		) {
 			pstmt.setString(1, uuid);
 			pstmt.executeUpdate();

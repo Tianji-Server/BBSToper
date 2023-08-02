@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class Util {
 
 	private static BukkitTask autorewardtask;
-	private static ArrayList<Integer> runningtaskidlist = new ArrayList<Integer>();
+	private static final ArrayList<Integer> runningtaskidlist = new ArrayList<>();
 
 	public static void startAutoReward() {// 自动奖励的方法
 		if (autorewardtask != null) {// 任务对象不为空
@@ -96,14 +96,14 @@ public class Util {
 		String extra = null;
 		if (incentive) {
 			// 如果休息日奖励也达成了, 并且激励奖励和休息日奖励都不是额外奖励, 不会发放激励奖励(只会发放休息日奖励)
-			if (!(offday && Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean() == false
-					&& Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean() == false)) {
-				extra = new String(Message.GUI_INCENTIVEREWARDS.getString());
+			if (!(offday && !Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()
+					&& !Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean())) {
+				extra = Message.GUI_INCENTIVEREWARDS.getString();
 			}
 		}
 		if (offday) {
 			if (extra == null) {
-				extra = new String(Message.GUI_OFFDAYREWARDS.getString());
+				extra = Message.GUI_OFFDAYREWARDS.getString();
 			} else {
 				extra = extra + "+" + Message.GUI_OFFDAYREWARDS.getString();
 			}

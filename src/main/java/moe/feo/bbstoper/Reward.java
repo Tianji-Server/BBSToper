@@ -12,14 +12,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class Reward {
-	private Player player; // 发放奖励的对象
-	private Crawler crawler; // 一个爬虫对象
-	private int index; // 要发放奖励的那条记录的序号
+	private final Player player; // 发放奖励的对象
+	private final Crawler crawler; // 一个爬虫对象
+	private final int index; // 要发放奖励的那条记录的序号
 
 	// current指需要判断的时间, before指上一个顶贴的时间
 	public static boolean canIncentiveReward(Calendar current, Calendar before) {
 		boolean result = false;
-		if (Option.REWARD_INCENTIVEREWARD_ENABLE.getBoolean() == true) {// 开启了激励奖励
+		if (Option.REWARD_INCENTIVEREWARD_ENABLE.getBoolean()) {// 开启了激励奖励
 			Calendar copyofcurrent = (Calendar) before.clone();// 一个上次顶贴时间的副本
 			copyofcurrent.add(Calendar.MINUTE, Option.REWARD_INCENTIVEREWARD_PERIOD.getInt());// 加上设定好的激励时间
 			if (copyofcurrent.before(current)) {// 如果这个时间已经处于"当前领奖的记录"之前
@@ -32,7 +32,7 @@ public class Reward {
 	// current指需要判断的时间
 	public static boolean canOffDayReward(Calendar current) {
 		boolean result = false;
-		if (Option.REWARD_OFFDAYREWARD_ENABLE.getBoolean() == true) {// 开启了休息日奖励
+		if (Option.REWARD_OFFDAYREWARD_ENABLE.getBoolean()) {// 开启了休息日奖励
 			for (String day : Option.REWARD_OFFDAYREWARD_OFFDAYS.getStringList()) {
 				Pattern upcasepattern = Pattern.compile("^[A-Z]+$");// 全大写英文字符串
 				Pattern datepattern = Pattern.compile("^\\d{2}-\\d{2}$");// 00-00格式的字符串
@@ -112,7 +112,7 @@ public class Reward {
 	}
 
 	public void award() {
-		List<String> cmds = new ArrayList<String>();
+		List<String> cmds = new ArrayList<>();
 		boolean incentive = false;// 是否符合激励奖励条件
 		boolean offday = false;// 是否符合休息日奖励条件
 		boolean normal = true;// 是否发放普通奖励
@@ -150,12 +150,12 @@ public class Reward {
 		String extra = null;
 		if (incentive) {// 如果激励奖励条件达成
 			// 如果休息日奖励也达成了, 并且激励奖励和休息日奖励都不是额外奖励, 不会发放激励奖励(只会发放休息日奖励)
-			if (!(offday && Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean() == false
-					&& Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean() == false)) {
+			if (!(offday && !Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()
+					&& !Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean())) {
 				cmds.addAll(Option.REWARD_INCENTIVEREWARD_COMMANDS.getStringList());
-				extra = new String(Message.GUI_INCENTIVEREWARDS.getString());
+				extra = Message.GUI_INCENTIVEREWARDS.getString();
 			}
-			if (Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean() == false) {
+			if (!Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()) {
 				// 如果这不是额外奖励, 则普通奖励不会发放
 				normal = false;
 			}
@@ -163,11 +163,11 @@ public class Reward {
 		if (offday) {// 如果休息日奖励条件达成
 			cmds.addAll(Option.REWARD_OFFDAYREWARD_COMMANDS.getStringList());
 			if (extra == null) {
-				extra = new String(Message.GUI_OFFDAYREWARDS.getString());
+				extra = Message.GUI_OFFDAYREWARDS.getString();
 			} else {
 				extra = extra + "+" + Message.GUI_OFFDAYREWARDS.getString();
 			}
-			if (Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean() == false) {
+			if (!Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean()) {
 				// 如果这不是额外奖励, 则普通奖励不会发放
 				normal = false;
 			}
@@ -176,13 +176,10 @@ public class Reward {
 			cmds.addAll(Option.REWARD_COMMANDS.getStringList());
 		}
 		// 让主线程执行
-		Bukkit.getScheduler().runTask(BBSToper.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				for (String cmd : cmds) {
-					cmd = cmd.replaceAll("%PLAYER%", player.getName());
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
-				}
+		Bukkit.getScheduler().runTask(BBSToper.getInstance(), () -> {
+			for (String cmd : cmds) {
+				cmd = cmd.replaceAll("%PLAYER%", player.getName());
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 			}
 		});
 		// 给玩家发个消息表示祝贺
@@ -211,13 +208,10 @@ public class Reward {
 			}
 		}
 		// 让主线程执行
-		Bukkit.getScheduler().runTask(BBSToper.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				for (String cmd : cmds) {
-					cmd = cmd.replaceAll("%PLAYER%", player.getName());
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
-				}
+		Bukkit.getScheduler().runTask(BBSToper.getInstance(), () -> {
+			for (String cmd : cmds) {
+				cmd = cmd.replaceAll("%PLAYER%", player.getName());
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 			}
 		});
 	}

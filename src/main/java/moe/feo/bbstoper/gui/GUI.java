@@ -28,8 +28,7 @@ public class GUI {
 	private Inventory inv;
 	
 	public static String getTitle() {// 获取插件的gui标题必须用此方法，因为用户可能会修改gui标题
-		String title = Message.GUI_TITLE.getString().replaceAll("%PREFIX%", Message.PREFIX.getString());
-		return title;
+		return Message.GUI_TITLE.getString().replaceAll("%PREFIX%", Message.PREFIX.getString());
 	}
 
 	public GUI(Player player) {
@@ -68,14 +67,14 @@ public class GUI {
 			}
 		}
 		skullmeta.setDisplayName(Message.GUI_SKULL.getString().replaceAll("%PLAYER%", player.getName()));
-		List<String> skulllores = new ArrayList<String>();
+		List<String> skulllores = new ArrayList<>();
 		Poster poster = sql.getPoster(player.getUniqueId().toString());
 		if (poster == null) {
 			skulllores.add(Message.GUI_NOTBOUND.getString());
 			skulllores.add(Message.GUI_CLICKBOUND.getString());
 		} else {
 			skulllores.add(Message.GUI_BBSID.getString().replaceAll("%BBSID%", poster.getBbsname()));
-			skulllores.add(Message.GUI_POSTTIMES.getString().replaceAll("%TIMES%", "" + poster.getTopStates().size()));
+			skulllores.add(Message.GUI_POSTTIMES.getString().replaceAll("%TIMES%", String.valueOf(poster.getTopStates().size())));
 			skulllores.add(Message.GUI_CLICKREBOUND.getString());
 		}
 		skullmeta.setLore(skulllores);
@@ -89,7 +88,7 @@ public class GUI {
 		}
 		ItemMeta sunflowermeta = sunflower.getItemMeta();
 		sunflowermeta.setDisplayName(Message.GUI_REWARDS.getString());
-		List<String> sunflowerlores = new ArrayList<String>(Message.GUI_REWARDSINFO.getStringList());// 自定义奖励信息
+		List<String> sunflowerlores = new ArrayList<>(Message.GUI_REWARDSINFO.getStringList());// 自定义奖励信息
 		if (sunflowerlores.isEmpty()) {// 如果没有自定义奖励信息
 			sunflowerlores.addAll(Option.REWARD_COMMANDS.getStringList());// 直接显示命令
 			if (Option.REWARD_INCENTIVEREWARD_ENABLE.getBoolean()) {
@@ -108,7 +107,7 @@ public class GUI {
 		ItemStack star = new ItemStack(Material.NETHER_STAR);
 		ItemMeta starmeta = star.getItemMeta();
 		starmeta.setDisplayName(Message.GUI_TOPS.getString());
-		List<String> starlores = new ArrayList<String>();
+		List<String> starlores = new ArrayList<>();
 		List<Poster> listposter = sql.getTopPosters();
 		for (int i = 0; i < listposter.size(); i++) {
 			if (i >= Option.GUI_TOPPLAYERS.getInt())
@@ -123,7 +122,7 @@ public class GUI {
 		ItemStack compass = new ItemStack(Material.COMPASS);
 		ItemMeta compassmeta = compass.getItemMeta();
 		compassmeta.setDisplayName(Message.GUI_PAGESTATE.getString());
-		List<String> compasslores = new ArrayList<String>();
+		List<String> compasslores = new ArrayList<>();
 		compasslores.add(Message.GUI_PAGEID.getString().replaceAll("%PAGEID%", Option.MCBBS_URL.getString()));
 		Crawler crawler = new Crawler();
 		if (crawler.visible) {// 如果帖子可视，就获取帖子最近一次顶贴

@@ -29,7 +29,7 @@ public class GUIManager implements Listener {
 		if(holder instanceof GUI.BBSToperGUIHolder) {// 确认操作的是此插件的GUI
 			event.setCancelled(true);
 			if (event.getRawSlot() == 12) {// 点击绑定
-				if (Option.GUI_USECHATGETID.getBoolean() == true) {
+				if (Option.GUI_USECHATGETID.getBoolean()) {
 					player.closeInventory();
 					UUID uid = player.getUniqueId();
 					synchronized (IDListener.lock) { // 线程锁防止异步错位修改
@@ -42,7 +42,7 @@ public class GUIManager implements Listener {
 						}
 					}
 				}
-				if (Option.GUI_USECHATGETID.getBoolean() == false) {
+				if (!Option.GUI_USECHATGETID.getBoolean()) {
 					player.closeInventory();
 					player.sendMessage(Message.PREFIX.getString() + Message.HELP_BINDING.getString());
 				}
