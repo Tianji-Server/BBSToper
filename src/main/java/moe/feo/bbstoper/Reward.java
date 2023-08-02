@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -176,7 +178,7 @@ public class Reward {
 			cmds.addAll(Option.REWARD_COMMANDS.getStringList());
 		}
 		// 让主线程执行
-		Bukkit.getScheduler().runTask(BBSToper.getInstance(), () -> {
+		Bukkit.getScheduler().runTask(BBSToper.INSTANCE, () -> {
 			for (String cmd : cmds) {
 				cmd = cmd.replaceAll("%PLAYER%", player.getName());
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
@@ -208,7 +210,7 @@ public class Reward {
 			}
 		}
 		// 让主线程执行
-		Bukkit.getScheduler().runTask(BBSToper.getInstance(), () -> {
+		Bukkit.getScheduler().runTask(BBSToper.INSTANCE, () -> {
 			for (String cmd : cmds) {
 				cmd = cmd.replaceAll("%PLAYER%", player.getName());
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);

@@ -7,7 +7,7 @@ import org.bukkit.scheduler.BukkitTask;
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.CLI;
 import moe.feo.bbstoper.Crawler;
-import moe.feo.bbstoper.Option;
+import moe.feo.bbstoper.config.Option;
 import moe.feo.bbstoper.PAPIExpansion;
 import moe.feo.bbstoper.Poster;
 import moe.feo.bbstoper.Reminder;
@@ -63,7 +63,7 @@ public class SQLManager {
 					initializeSQLer();// 重载数据库
 					Util.removeRunningTaskID(this.getTaskId());
 				}
-			}.runTaskTimerAsynchronously(BBSToper.getInstance(), period, period);
+			}.runTaskTimerAsynchronously(BBSToper.INSTANCE, period, period);
 		}
 	}
 }

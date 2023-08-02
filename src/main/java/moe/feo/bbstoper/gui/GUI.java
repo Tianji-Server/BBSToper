@@ -16,8 +16,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.Crawler;
-import moe.feo.bbstoper.Message;
-import moe.feo.bbstoper.Option;
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import moe.feo.bbstoper.Poster;
 import moe.feo.bbstoper.Util;
 import moe.feo.bbstoper.sql.SQLer;
@@ -33,7 +33,7 @@ public class GUI {
 
 	public GUI(Player player) {
 		createGui(player);
-		Bukkit.getScheduler().runTask(BBSToper.getInstance(), () -> player.openInventory(inv));
+		Bukkit.getScheduler().runTask(BBSToper.INSTANCE, () -> player.openInventory(inv));
 	}
 	
 	class BBSToperGUIHolder implements InventoryHolder {// 定义一个Holder用于识别此插件的GUI

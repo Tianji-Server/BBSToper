@@ -30,8 +30,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.CLI;
-import moe.feo.bbstoper.Message;
-import moe.feo.bbstoper.Option;
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import moe.feo.bbstoper.Util;
 
 public class IDListener extends RegisteredListener implements Listener, EventExecutor {
@@ -54,7 +54,7 @@ public class IDListener extends RegisteredListener implements Listener, EventExe
 	}
 
 	public IDListener(UUID uuid) {// 在构造函数中初始化RegisteredListener和UUID
-		super(null, null, EventPriority.HIGH, BBSToper.getInstance(), false);
+		super(null, null, EventPriority.HIGH, BBSToper.INSTANCE, false);
 		this.uid = uuid;
 		this.state = false;
 	}
@@ -75,7 +75,7 @@ public class IDListener extends RegisteredListener implements Listener, EventExe
 		synchronized (lock) {
 			AsyncPlayerChatEvent.getHandlerList().unregister((RegisteredListener) this);
 			if (!map.remove(uid, this)) {
-				BBSToper.getInstance().getLogger().warning(Message.FAILEDUNINSTALLMO.getString());
+				BBSToper.INSTANCE.getLogger().warning(Message.FAILEDUNINSTALLMO.getString());
 			}
 		}
 	}
@@ -97,7 +97,7 @@ public class IDListener extends RegisteredListener implements Listener, EventExe
 				unregister(uid);
 				Util.removeRunningTaskID(this.getTaskId());
 			}
-		}.runTaskLater(BBSToper.getInstance(), 2 * 60 * 20);// 如果这个监听器还存在，那么将在2分钟后被取消
+		}.runTaskLater(BBSToper.INSTANCE, 2 * 60 * 20);// 如果这个监听器还存在，那么将在2分钟后被取消
 		AsyncPlayerChatEvent.getHandlerList().register(this);
 	}
 

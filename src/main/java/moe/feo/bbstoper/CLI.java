@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -28,10 +30,6 @@ public class CLI implements TabExecutor {
 	private final Map<UUID, Long> queryrecord = new HashMap<>();// 这个map是用于储存玩家上次查询顶贴记录的时间
 
 	private static final CLI cli = new CLI();
-
-	private CLI() {
-
-	}
 
 	public static CLI getInstance() {
 		return cli;
@@ -468,9 +466,8 @@ public class CLI implements TabExecutor {
 						sender.sendMessage(Message.PREFIX.getString() + Message.NOPERMISSION.getString());
 						return;
 					}
-					BBSToper.getInstance().saveDefaultConfig();
+					BBSToper.INSTANCE.saveDefaultConfig();
 					Option.load();
-					Message.saveDefaultConfig();
 					Message.load();
 					SQLManager.initializeSQLer();
 					SQLManager.startTimingReconnect();
@@ -543,7 +540,7 @@ public class CLI implements TabExecutor {
 				}
 				}
 			}
-		}.runTaskAsynchronously(BBSToper.getInstance());
+		}.runTaskAsynchronously(BBSToper.INSTANCE);
 		return true;
 	}
 

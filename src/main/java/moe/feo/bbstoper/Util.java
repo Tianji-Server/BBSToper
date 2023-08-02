@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -43,7 +45,7 @@ public class Util {
 						return;
 					crawler.activeReward();
 				}
-			}.runTaskTimerAsynchronously(BBSToper.getInstance(), 0, period);
+			}.runTaskTimerAsynchronously(BBSToper.INSTANCE, 0, period);
 		}
 	}
 

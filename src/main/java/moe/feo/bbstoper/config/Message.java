@@ -1,12 +1,12 @@
-package moe.feo.bbstoper;
+package moe.feo.bbstoper.config;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Charsets;
+import moe.feo.bbstoper.BBSToper;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -95,52 +95,25 @@ public enum Message {
 	public final String path;
 
 	private static FileConfiguration messageConfig;
-	private static File messageFile;
-	private String cacheString; // 缓存内容
-	private List<String> cacheStringList; // 缓存内容
 
 	Message(String path) {
 		this.path = path;
 	}
 
 	public static void load() {// 加载与重载
-		if (messageFile == null) {
-			messageFile = new File(BBSToper.getInstance().getDataFolder(), "lang.yml");
-		}
-		messageConfig = YamlConfiguration.loadConfiguration(messageFile);// 加载配置
-		try (Reader reader = new InputStreamReader(BBSToper.getInstance().getResource("lang.yml"),
-				StandardCharsets.UTF_8)) {// 读取默认配置
-			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(reader);
-			messageConfig.setDefaults(defConfig);// 设置默认
-		} catch (IOException ioe) {
-			BBSToper.getInstance().getLogger().log(Level.SEVERE, "读取默认语言文件时出错!", ioe);
-		}
-		// 删除缓存
-		for (Message m : values()) {
-			m.cacheString = null;
-			m.cacheStringList = null;
-		}
-	}
-
-	public static void saveDefaultConfig() {
-		if (messageFile == null) {
-			messageFile = new File(BBSToper.getInstance().getDataFolder(), "lang.yml");
-		}
-		if (!messageFile.exists()) {
-			BBSToper.getInstance().saveResource("lang.yml", false);
+		messageConfig = YamlConfiguration.loadConfiguration(new File(BBSToper.INSTANCE.getDataFolder(), "lang.yml"));// 加载配置
+		InputStream defConfigStream = BBSToper.INSTANCE.getResource("lang.yml");
+		if (defConfigStream != null) {
+			BBSToper.INSTANCE.getConfig().setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
 		}
 	}
 
 	public String getString() {
-		if (cacheString != null)
-			return cacheString;
-		return cacheString = ChatColor.translateAlternateColorCodes('&', messageConfig.getString(path));
+		return ChatColor.translateAlternateColorCodes('&', messageConfig.getString(path));
 	}
 
 	public List<String> getStringList() {
-		if (cacheStringList != null)
-			return cacheStringList;
-		return cacheStringList = Collections.unmodifiableList(// 禁止修改
+		return Collections.unmodifiableList(// 禁止修改
 				messageConfig.getStringList(path).stream().map(msg -> ChatColor.translateAlternateColorCodes('&', msg))
 						.collect(Collectors.toList()));
 	}

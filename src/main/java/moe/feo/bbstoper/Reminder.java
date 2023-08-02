@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -65,7 +67,7 @@ public class Reminder implements Listener {
 					event.getPlayer().sendMessage(Message.PREFIX.getString() + Message.HELP_BINDING.getString());
 				}
 			}
-		}.runTaskAsynchronously(BBSToper.getInstance());
+		}.runTaskAsynchronously(BBSToper.INSTANCE);
 	}
 
 	public static void setSQLer(SQLer sql) {

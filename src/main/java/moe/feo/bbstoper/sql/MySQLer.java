@@ -1,8 +1,8 @@
 package moe.feo.bbstoper.sql;
 
 import moe.feo.bbstoper.BBSToper;
-import moe.feo.bbstoper.Message;
-import moe.feo.bbstoper.Option;
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -61,7 +61,7 @@ public class MySQLer extends SQLer {
 			Class.forName(driver);
 			this.conn = DriverManager.getConnection(getUrl(), user, password);
 		} catch (ClassNotFoundException | SQLException e) {
-			BBSToper.getInstance().getLogger().log(Level.WARNING, Message.FAILEDCONNECTSQL.getString(), e);
+			BBSToper.INSTANCE.getLogger().log(Level.WARNING, Message.FAILEDCONNECTSQL.getString(), e);
 		}
 	}
 

@@ -1,13 +1,12 @@
-package moe.feo.bbstoper;
+package moe.feo.bbstoper.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.logging.Level;
 
+import com.google.common.base.Charsets;
+import moe.feo.bbstoper.BBSToper;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -50,8 +49,6 @@ public enum Option {
 	REWARD_OFFDAYREWARD_OFFDAYS("reward.offdayreward.offdays"),
 	REWARD_OFFDAYREWARD_COMMANDS("reward.offdayreward.commands");
 
-	private static File file;
-	private static FileConfiguration config;
 	private final String path;
 
 	Option(String path) {
@@ -59,32 +56,26 @@ public enum Option {
 	}
 
 	public static void load() {
-		if (file == null) {
-			file = new File(BBSToper.getInstance().getDataFolder(), "config.yml");
-		}
-		config = YamlConfiguration.loadConfiguration(file);// 用这个方法加载配置可以解决编码问题
-		try (Reader reader = new InputStreamReader(BBSToper.getInstance().getResource("config.yml"),
-				StandardCharsets.UTF_8)) {// 读取默认配置
-			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(reader);
-			config.setDefaults(defConfig);// 设置默认
-		} catch (IOException ioe) {
-			BBSToper.getInstance().getLogger().log(Level.SEVERE, "读取默认配置文件时出错!", ioe);
+		BBSToper.INSTANCE.reloadConfig();
+		InputStream defConfigStream = BBSToper.INSTANCE.getResource("config.yml");
+		if (defConfigStream != null) {
+			BBSToper.INSTANCE.getConfig().setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
 		}
 	}
 
 	public String getString() {
-		return config.getString(path);
+		return BBSToper.INSTANCE.getConfig().getString(path);
 	}
 
 	public List<String> getStringList() {
-		return config.getStringList(path);
+		return BBSToper.INSTANCE.getConfig().getStringList(path);
 	}
 
 	public boolean getBoolean() {
-		return config.getBoolean(path);
+		return BBSToper.INSTANCE.getConfig().getBoolean(path);
 	}
 
 	public int getInt() {
-		return config.getInt(path);
+		return BBSToper.INSTANCE.getConfig().getInt(path);
 	}
 }

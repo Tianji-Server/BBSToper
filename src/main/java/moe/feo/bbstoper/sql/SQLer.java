@@ -1,6 +1,6 @@
 package moe.feo.bbstoper.sql;
 
-import moe.feo.bbstoper.Option;
+import moe.feo.bbstoper.config.Option;
 import moe.feo.bbstoper.Poster;
 
 import java.sql.Connection;

@@ -3,6 +3,8 @@ package moe.feo.bbstoper;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import org.bukkit.entity.Player;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -17,9 +19,9 @@ public class PAPIExpansion extends PlaceholderExpansion {
 	private final String version;
 
 	PAPIExpansion() {
-		this.author = BBSToper.getInstance().getDescription().getAuthors().toString();
-		this.identifier = BBSToper.getInstance().getDescription().getName().toLowerCase();
-		this.version = BBSToper.getInstance().getDescription().getVersion();
+		this.author = BBSToper.INSTANCE.getDescription().getAuthors().toString();
+		this.identifier = BBSToper.INSTANCE.getDescription().getName().toLowerCase();
+		this.version = BBSToper.INSTANCE.getDescription().getVersion();
 	}
 
 	public static void setSQLer(SQLer sql) {

@@ -8,8 +8,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 
 import moe.feo.bbstoper.CLI;
-import moe.feo.bbstoper.Message;
-import moe.feo.bbstoper.Option;
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 
 import java.util.Arrays;
 import java.util.UUID;

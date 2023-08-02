@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import moe.feo.bbstoper.config.Message;
+import moe.feo.bbstoper.config.Option;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -43,7 +45,7 @@ public class Crawler {
 			if (Option.DEBUG.getBoolean()) {
 				e.printStackTrace(); // 这里经常会因为网络连接不顺畅而报错
 			}
-			BBSToper.getInstance().getLogger().warning(Message.FAILEDGETWEB.getString());
+			BBSToper.INSTANCE.getLogger().warning(Message.FAILEDGETWEB.getString());
 			return;// 没抓到网页就不要继续了，会空指针
 		}
 		Elements listclass = doc.getElementsByClass("list");// 获取一个class名为list的元素的合集
@@ -54,7 +56,7 @@ public class Crawler {
 			this.visible = false;
 			String warn = Message.FAILEDRESOLVEWEB.getString();
 			if (!warn.isEmpty()) {
-				BBSToper.getInstance().getLogger().warning(Message.FAILEDRESOLVEWEB.getString());
+				BBSToper.INSTANCE.getLogger().warning(Message.FAILEDRESOLVEWEB.getString());
 			}
 			return;
 		}
