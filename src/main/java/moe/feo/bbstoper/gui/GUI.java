@@ -66,7 +66,7 @@ public class GUI {
 		}
 		skullMeta.setDisplayName(Message.GUI_SKULL.getString().replaceAll("%PLAYER%", player.getName()));
 		List<String> skullLores = new ArrayList<>();
-		Poster poster = DatabaseManager.connection.getPoster(player.getUniqueId().toString());
+		Poster poster = DatabaseManager.database.getPoster(player.getUniqueId().toString());
 		if (poster != null) {
 			skullLores.add(Message.GUI_BBSID.getString().replaceAll("%BBSID%", poster.getBbsname()));
 			skullLores.add(Message.GUI_POSTTIMES.getString().replaceAll("%TIMES%", String.valueOf(poster.getTopStates().size())));
@@ -108,7 +108,7 @@ public class GUI {
 		ItemMeta starMeta = star.getItemMeta();
 		starMeta.setDisplayName(Message.GUI_TOPS.getString());
 		List<String> starLore = new ArrayList<>();
-		List<Poster> posters = DatabaseManager.connection.getTopPosters();
+		List<Poster> posters = DatabaseManager.database.getTopPosters();
 		for (int i = 0; i < posters.size(); i++) {
 			if (i >= Config.GUI_TOPPLAYERS.getInt())
 				break;

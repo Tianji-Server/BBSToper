@@ -70,7 +70,7 @@ public class Poster {
 	}
 
 	public List<String> getTopStates() {
-		return DatabaseManager.connection.getTopStatesFromPoster(this);
+		return DatabaseManager.database.getTopStatesFromPoster(this);
 	}
 
 }

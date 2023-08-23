@@ -52,7 +52,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 	public String onPlaceholderRequest(Player player, String identifier) {
 		Poster poster;
 		if (player != null) {// 有玩家
-			poster = DatabaseManager.connection.getPoster(player.getUniqueId().toString());
+			poster = DatabaseManager.database.getPoster(player.getUniqueId().toString());
 			if (identifier.equals("bbsid")) {// BBS用户名
 				if (poster == null) {
 					return Message.GUI_NOTBOUND.getString();
@@ -97,7 +97,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 		if (Pattern.matches(pattern, identifier)) {// 如果匹配这种格式
 			int rank = Integer.parseInt(identifier.split("_")[1]);
 			int index = rank - 1;
-			List<Poster> listposter = DatabaseManager.connection.getTopPosters();
+			List<Poster> listposter = DatabaseManager.database.getTopPosters();
 			if (index < listposter.size()) {
 				return Message.POSTERPLAYER.getString() + ":" + listposter.get(index).getName() + " "
 						+ Message.POSTERID.getString() + ":" + listposter.get(index).getBbsname() + " "

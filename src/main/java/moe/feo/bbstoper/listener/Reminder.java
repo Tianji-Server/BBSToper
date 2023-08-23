@@ -42,7 +42,7 @@ public class Reminder implements Listener {
 				boolean isbinded = true;// 是否绑定
 				boolean isposted = true;// 是否有顶贴者
 				UUID uuid = event.getPlayer().getUniqueId();
-				Poster poster = DatabaseManager.connection.getPoster(uuid.toString());
+				Poster poster = DatabaseManager.database.getPoster(uuid.toString());
 				String datenow = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 				if (poster == null) {// 玩家未绑定
 					isbinded = false;

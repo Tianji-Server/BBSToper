@@ -3,16 +3,14 @@ package moe.feo.bbstoper.database;
 import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.Poster;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public abstract class AbstractSQLConnection {
+public abstract class AbstractDatabase {
 	
 	public static final ReadWriteLock lock = new ReentrantReadWriteLock();
 	public static final Lock readlock = lock.readLock();
@@ -248,6 +246,28 @@ public abstract class AbstractSQLConnection {
 		}
 	}
 
+	protected void createTablePosters() {
+		String sql = String.format(
+				"CREATE TABLE IF NOT EXISTS `%s` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) );",
+				getTableName("posters"));
+		try (Statement stmt = getConnection().createStatement()) {
+			stmt.execute(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void createTableTopStates() {
+		String sql = String.format(
+				"CREATE TABLE IF NOT EXISTS `%s` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `time` varchar(16) NOT NULL);",
+				getTableName("topstates"));
+		try (Statement stmt = getConnection().createStatement()) {
+			stmt.execute(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	// 获取当前sql的连接
 	protected abstract Connection getConnection();
 
@@ -255,6 +275,5 @@ public abstract class AbstractSQLConnection {
 	protected abstract void closeConnection();
 
 	// 加载，插件启动时调用
-	protected abstract void load() throws ClassNotFoundException;
-
+	protected abstract void connect() throws ClassNotFoundException;
 }

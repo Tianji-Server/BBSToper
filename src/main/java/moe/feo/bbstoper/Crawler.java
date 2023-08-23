@@ -92,9 +92,9 @@ public class Crawler {
 		for (int i = 0; i < ID.size(); i++) {
 			String bbsName = ID.get(i);
 			String time = Time.get(i);
-			if (!DatabaseManager.connection.checkTopstate(bbsName, time)) {// 如果这个记录不存在于数据库中
-				String uuid = DatabaseManager.connection.bbsNameCheck(bbsName);
-				Poster poster = DatabaseManager.connection.getPoster(uuid);
+			if (!DatabaseManager.database.checkTopstate(bbsName, time)) {// 如果这个记录不存在于数据库中
+				String uuid = DatabaseManager.database.bbsNameCheck(bbsName);
+				Poster poster = DatabaseManager.database.getPoster(uuid);
 				if (uuid != null) {// 这个玩家已经绑定,这时候就可以开始对玩家进行检测了
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 					if (!offlinePlayer.isOnline() || Bukkit.getPlayer(UUID.fromString(uuid)).hasPermission("bbstoper.reward")) {
@@ -114,9 +114,9 @@ public class Crawler {
 
 					// 这时候就可以给玩家发奖励了
 					new Reward(player, this, i).award();
-					DatabaseManager.connection.addTopState(bbsName, time);
+					DatabaseManager.database.addTopState(bbsName, time);
 					poster.setRewardtime(poster.getRewardtime() + 1);
-					DatabaseManager.connection.updatePoster(poster);// 把poster储存起来
+					DatabaseManager.database.updatePoster(poster);// 把poster储存起来
 
 					// 给有奖励权限且能看见此玩家(防止Vanish)的玩家广播
 					for (Player p : Bukkit.getOnlinePlayers()) {
