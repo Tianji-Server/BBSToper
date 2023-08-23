@@ -92,7 +92,7 @@ public class Crawler {
 		for (int i = 0; i < ID.size(); i++) {
 			String bbsName = ID.get(i);
 			String time = Time.get(i);
-			if (!DatabaseManager.database.checkTopstate(bbsName, time)) {// 如果这个记录不存在于数据库中
+			if (!DatabaseManager.database.checkTopState(bbsName, time)) {// 如果这个记录不存在于数据库中
 				String uuid = DatabaseManager.database.bbsNameCheck(bbsName);
 				Poster poster = DatabaseManager.database.getPoster(uuid);
 				if (uuid != null) {// 这个玩家已经绑定,这时候就可以开始对玩家进行检测了

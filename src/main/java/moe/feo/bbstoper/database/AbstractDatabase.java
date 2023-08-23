@@ -25,14 +25,14 @@ public abstract class AbstractDatabase {
 		String sql = String.format(
 				"INSERT INTO `%s` (`uuid`, `name`, `bbsname`, `binddate`, `rewardbefore`, `rewardtimes`) VALUES (?, ?, ?, ?, ?, ?);",
 				getTableName("posters"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
-			pstmt.setString(1, poster.getUuid());
-			pstmt.setString(2, poster.getName());
-			pstmt.setString(3, poster.getBbsname());
-			pstmt.setLong(4, poster.getBinddate());
-			pstmt.setString(5, poster.getRewardbefore());
-			pstmt.setInt(6, poster.getRewardtime());
-			pstmt.executeUpdate();
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setString(1, poster.getUuid());
+			stmt.setString(2, poster.getName());
+			stmt.setString(3, poster.getBbsname());
+			stmt.setLong(4, poster.getBinddate());
+			stmt.setString(5, poster.getRewardbefore());
+			stmt.setInt(6, poster.getRewardtime());
+			stmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -45,14 +45,14 @@ public abstract class AbstractDatabase {
 		String sql = String.format(
 				"UPDATE `%s` SET `name`=?, `bbsname`=?, `binddate`=?, `rewardbefore`=?, `rewardtimes`=? WHERE `uuid`=?;",
 				getTableName("posters"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
-			pstmt.setString(1, poster.getName());
-			pstmt.setString(2, poster.getBbsname());
-			pstmt.setLong(3, poster.getBinddate());
-			pstmt.setString(4, poster.getRewardbefore());
-			pstmt.setInt(5, poster.getRewardtime());
-			pstmt.setString(6, poster.getUuid());
-			pstmt.executeUpdate();
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setString(1, poster.getName());
+			stmt.setString(2, poster.getBbsname());
+			stmt.setLong(3, poster.getBinddate());
+			stmt.setString(4, poster.getRewardbefore());
+			stmt.setInt(5, poster.getRewardtime());
+			stmt.setString(6, poster.getUuid());
+			stmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -60,11 +60,11 @@ public abstract class AbstractDatabase {
 		}
 	}
 
-	public void addTopState(String mcbbsname, String time) { // 记录一个顶贴
+	public void addTopState(String bbsName, String time) { // 记录一个顶贴
 		readlock.lock();
 		String sql = String.format("INSERT INTO `%s` (`bbsname`, `time`) VALUES (?, ?);", getTableName("topstates"));
 		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
-			pstmt.setString(1, mcbbsname);
+			pstmt.setString(1, bbsName);
 			pstmt.setString(2, time);
 			pstmt.executeUpdate();
 		} catch (Exception e) {
@@ -78,9 +78,9 @@ public abstract class AbstractDatabase {
 		readlock.lock();
 		String sql = String.format("SELECT * from `%s` WHERE `uuid`=?;", getTableName("posters"));
 		Poster poster = null;
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
-			pstmt.setString(1, uuid);
-			try (ResultSet rs = pstmt.executeQuery()) {
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setString(1, uuid);
+			try (ResultSet rs = stmt.executeQuery()) {
 				try {
 					if (rs.isClosed())
 						return poster;
@@ -109,9 +109,9 @@ public abstract class AbstractDatabase {
 		readlock.lock();
 		List<String> list = new ArrayList<>();
 		String sql = String.format("SELECT `time` from `%s` WHERE `bbsname`=?;", getTableName("topstates"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
-			pstmt.setString(1, poster.getBbsname());
-			try (ResultSet rs = pstmt.executeQuery()) {
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setString(1, poster.getBbsname());
+			try (ResultSet rs = stmt.executeQuery()) {
 				try {
 					if (rs.isClosed())
 						return list;
@@ -130,13 +130,13 @@ public abstract class AbstractDatabase {
 		return list;
 	}
 
-	public String bbsNameCheck(String bbsname) {// 检查这个bbsname并返回一个uuid
+	public String bbsNameCheck(String bbsName) {// 检查这个bbsname并返回一个uuid
 		readlock.lock();
 		String sql = String.format("SELECT `uuid` from `%s` WHERE `bbsname`=?;", getTableName("posters"));
 		String uuid = null;
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
-			pstmt.setString(1, bbsname);
-			try (ResultSet rs = pstmt.executeQuery()) {
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setString(1, bbsName);
+			try (ResultSet rs = stmt.executeQuery()) {
 				try {
 					if (rs.isClosed())// 如果查询是空的sqlite就会把结果关闭
 						return uuid;
@@ -155,14 +155,14 @@ public abstract class AbstractDatabase {
 		return uuid;
 	}
 
-	public boolean checkTopstate(String bbsname, String time) {// 查询是否存在这条记录，如果存在返回true，不存在返回false
+	public boolean checkTopState(String bbsName, String time) {// 查询是否存在这条记录，如果存在返回true，不存在返回false
 		readlock.lock();
 		String sql = String.format("SELECT * FROM `%s` WHERE `bbsname`=? AND `time`=? LIMIT 1;",
 				getTableName("topstates"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
-			pstmt.setString(1, bbsname);
-			pstmt.setString(2, time);
-			try (ResultSet rs = pstmt.executeQuery()) {
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+			stmt.setString(1, bbsName);
+			stmt.setString(2, time);
+			try (ResultSet rs = stmt.executeQuery()) {
 				try {
 					if (rs.isClosed()) {// sqlite会关闭这个结果
 						return false;
@@ -187,8 +187,8 @@ public abstract class AbstractDatabase {
 		String sql = String.format("SELECT bbsname,COUNT(*) FROM `%s` GROUP BY bbsname ORDER BY COUNT(*) DESC;",
 				getTableName("topstates"));
 		List<Poster> list = new ArrayList<>();
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);
-			 ResultSet rs = pstmt.executeQuery()) {
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql);
+			 ResultSet rs = stmt.executeQuery()) {
 
 			while (rs.next()) {
 				String uuid = bbsNameCheck(rs.getString("bbsname"));
@@ -210,8 +210,8 @@ public abstract class AbstractDatabase {
 		readlock.lock();
 		String sql = String.format("SELECT * FROM `%s` WHERE `rewardbefore`='';", getTableName("posters"));
 		List<Poster> posterlist = new ArrayList<>();
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql);
-			 ResultSet rs = pstmt.executeQuery()) {
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql);
+			 ResultSet rs = stmt.executeQuery()) {
 			while (rs.next()) {
 				Poster poster = new Poster();
 				poster.setUuid(rs.getString("uuid"));
@@ -235,10 +235,10 @@ public abstract class AbstractDatabase {
 	public void deletePoster(String uuid) {
 		readlock.lock();
 		String sql = String.format("DELETE FROM `%s` WHERE `uuid`=?;", getTableName("posters"));
-		try (PreparedStatement pstmt = getConnection().prepareStatement(sql)
+		try (PreparedStatement stmt = getConnection().prepareStatement(sql)
 		) {
-			pstmt.setString(1, uuid);
-			pstmt.executeUpdate();
+			stmt.setString(1, uuid);
+			stmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
