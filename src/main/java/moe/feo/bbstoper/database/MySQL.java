@@ -2,6 +2,7 @@ package moe.feo.bbstoper.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import me.dreamvoid.bbstoper.Utils;
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.config.Message;
 import moe.feo.bbstoper.config.Option;
@@ -11,13 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class MySQL extends AbstractSQLConnection {
-
-	private final static MySQL sqler = new MySQL();
 	private HikariDataSource ds;
-
-	public static MySQL getInstance() {
-		return sqler;
-	}
 
 	@Override
 	protected Connection getConnection() {
@@ -35,23 +30,19 @@ public class MySQL extends AbstractSQLConnection {
 	}
 
 	@Override
-	protected void load() {
+	protected void load() throws ClassNotFoundException {
 		connect();
 		createTablePosters();
 		createTableTopStates();
 	}
 
-	protected void connect() {
-		String driver = null;
-		try{
-			Class.forName("com.mysql.cj.jdbc.Driver");
+	protected void connect() throws ClassNotFoundException {
+		String driver;
+		if(Utils.findClass("com.mysql.cj.jdbc.Driver")){
 			driver = "com.mysql.cj.jdbc.Driver";
-		} catch (ClassNotFoundException ignored) {
-			try {
-				Class.forName("com.mysql.jdbc.Driver");
-				driver = "com.mysql.jdbc.Driver";
-			} catch (ClassNotFoundException ignored1) {}
-		}
+		} else if (Utils.findClass("com.mysql.jdbc.Driver")) {
+			driver = "com.mysql.jdbc.Driver";
+		} else throw new ClassNotFoundException("Both \"com.mysql.jdbc.Driver\" and \"com.mysql.cj.jdbc.Driver\" not found.");
 
 		HikariConfig config = new HikariConfig();
 		config.setDriverClassName(driver);
@@ -72,9 +63,7 @@ public class MySQL extends AbstractSQLConnection {
 	}
 
 	protected void createTablePosters() {
-		String sql = String.format(
-				"CREATE TABLE IF NOT EXISTS `%s` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;",
-				getTableName("posters"));
+		String sql = "CREATE TABLE IF NOT EXISTS `" + getTableName("posters") + "` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;";
 		try (Statement stmt = getConnection().createStatement()) {
 			stmt.execute(sql);
 		} catch (SQLException e) {

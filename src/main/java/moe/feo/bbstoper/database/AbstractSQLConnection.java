@@ -255,6 +255,6 @@ public abstract class AbstractSQLConnection {
 	protected abstract void closeConnection();
 
 	// 加载，插件启动时调用
-	protected abstract void load();
+	protected abstract void load() throws ClassNotFoundException;
 
 }
