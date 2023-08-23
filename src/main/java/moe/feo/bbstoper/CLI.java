@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import moe.feo.bbstoper.gui.GUI;
-import moe.feo.bbstoper.gui.IDListener;
+import moe.feo.bbstoper.listener.IDListener;
 
 public class CLI implements TabExecutor {
 	private final Map<String, String> cache = new HashMap<>();// 这个map是为了暂存玩家的绑定信息的

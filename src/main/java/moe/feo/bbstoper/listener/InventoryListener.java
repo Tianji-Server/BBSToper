@@ -1,7 +1,6 @@
 package moe.feo.bbstoper.listener;
 
 import moe.feo.bbstoper.gui.GUI;
-import moe.feo.bbstoper.gui.IDListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

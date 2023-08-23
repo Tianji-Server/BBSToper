@@ -14,7 +14,7 @@
  *		  void register();
  */
 
-package moe.feo.bbstoper.gui;
+package moe.feo.bbstoper.listener;
 
 import java.util.*;
 import org.bukkit.command.CommandSender;
