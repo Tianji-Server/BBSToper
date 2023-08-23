@@ -51,7 +51,7 @@ public class BBSToper extends JavaPlugin {
 		Bukkit.getScheduler().cancelTasks(INSTANCE);
 		Thread thread = new Thread(() -> {
 			Util.waitForAllTask();// 此方法会阻塞
-			DatabaseManager.closeSQLer();
+			DatabaseManager.closeSQL();
 			INSTANCE = null;
 		});
 		thread.setDaemon(true);

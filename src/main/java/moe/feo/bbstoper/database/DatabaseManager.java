@@ -13,24 +13,29 @@ public class DatabaseManager {
 	public static void initializeDatabase() {// 初始化或重载数据库
 		try {
 			AbstractSQLConnection.writelock.lock();
-			if (connection != null) {
-				connection.closeConnection();// 此方法会在已经建立过连接的情况下关闭连接
-			}
-			if (Config.DATABASE_TYPE.getString().equalsIgnoreCase("mysql")) {
-				connection = new MySQL();
-			} else if (Config.DATABASE_TYPE.getString().equalsIgnoreCase("sqlite")) {
-				connection = new SQLite();
+			if (connection != null) connection.closeConnection();// 此方法会在已经建立过连接的情况下关闭连接
+
+			switch (Config.DATABASE_TYPE.getString().toLowerCase()){
+				case "sqlite":
+				default:{
+					connection = new SQLite();
+					break;
+				}
+				case "mysql":{
+					connection = new MySQL();
+					break;
+				}
 			}
 			connection.load();
 		} catch (Exception e) {
-			BBSToper.INSTANCE.getLogger().severe("Failed to initialize databse: " + e);
+			BBSToper.INSTANCE.getLogger().severe("Failed to initialize database: " + e);
 			if(Config.DEBUG.getBoolean()) e.printStackTrace();
 		} finally {
 			AbstractSQLConnection.writelock.unlock();
 		}
 	}
 
-	public static void closeSQLer() {// 关闭数据库
+	public static void closeSQL() {// 关闭数据库
 		connection.closeConnection();
 		connection = null;
 	}
