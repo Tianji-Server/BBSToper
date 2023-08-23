@@ -2,7 +2,7 @@ package moe.feo.bbstoper.database;
 
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.Util;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -16,15 +16,15 @@ public class DatabaseManager {
 			if (connection != null) {
 				connection.closeConnection();// 此方法会在已经建立过连接的情况下关闭连接
 			}
-			if (Option.DATABASE_TYPE.getString().equalsIgnoreCase("mysql")) {
+			if (Config.DATABASE_TYPE.getString().equalsIgnoreCase("mysql")) {
 				connection = new MySQL();
-			} else if (Option.DATABASE_TYPE.getString().equalsIgnoreCase("sqlite")) {
+			} else if (Config.DATABASE_TYPE.getString().equalsIgnoreCase("sqlite")) {
 				connection = new SQLite();
 			}
 			connection.load();
 		} catch (Exception e) {
 			BBSToper.INSTANCE.getLogger().severe("Failed to initialize databse: " + e);
-			if(Option.DEBUG.getBoolean()) e.printStackTrace();
+			if(Config.DEBUG.getBoolean()) e.printStackTrace();
 		} finally {
 			AbstractSQLConnection.writelock.unlock();
 		}
@@ -39,7 +39,7 @@ public class DatabaseManager {
 		if (timingReconnectTask != null && !timingReconnectTask.isCancelled()) {// 将之前的任务取消(如果存在)
 			timingReconnectTask.cancel();
 		}
-		int period = Option.DATABASE_TIMINGRECONNECT.getInt() * 20;
+		int period = Config.DATABASE_TIMINGRECONNECT.getInt() * 20;
 		if (period > 0) {
 			timingReconnectTask = new BukkitRunnable() {
 				@Override

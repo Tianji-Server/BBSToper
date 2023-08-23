@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import me.dreamvoid.bbstoper.Utils;
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -46,15 +46,15 @@ public class MySQL extends AbstractSQLConnection {
 
 		HikariConfig config = new HikariConfig();
 		config.setDriverClassName(driver);
-		config.setJdbcUrl("jdbc:mysql://" + Option.DATABASE_MYSQL_ADDRESS + "/" + Option.DATABASE_MYSQL_DATABASE + Option.DATABASE_MYSQL_PARAMETERS);
-		config.setUsername(Option.DATABASE_MYSQL_USERNAME.getString());
-		config.setPassword(Option.DATABASE_MYSQL_PASSWORD.getString());
-		config.setConnectionTimeout(Option.DATABASE_POOL_CONNECTIONTIMEOUT.getLong());
-		config.setIdleTimeout(Option.DATABASE_POOL_IDLETIMEOUT.getLong());
-		config.setMaxLifetime(Option.DATABASE_POOL_MAXLIFETIME.getLong());
-		config.setMaximumPoolSize(Option.DATABASE_POOL_MAXIUMPOOLSIZE.getInt());
-		config.setKeepaliveTime(Option.DATABASE_POOL_KEEPALIVETIME.getLong());
-		config.setMinimumIdle(Option.DATABASE_POOL_MINIMUMIDLE.getInt());
+		config.setJdbcUrl("jdbc:mysql://" + Config.DATABASE_MYSQL_ADDRESS + "/" + Config.DATABASE_MYSQL_DATABASE + Config.DATABASE_MYSQL_PARAMETERS);
+		config.setUsername(Config.DATABASE_MYSQL_USERNAME.getString());
+		config.setPassword(Config.DATABASE_MYSQL_PASSWORD.getString());
+		config.setConnectionTimeout(Config.DATABASE_POOL_CONNECTIONTIMEOUT.getLong());
+		config.setIdleTimeout(Config.DATABASE_POOL_IDLETIMEOUT.getLong());
+		config.setMaxLifetime(Config.DATABASE_POOL_MAXLIFETIME.getLong());
+		config.setMaximumPoolSize(Config.DATABASE_POOL_MAXIUMPOOLSIZE.getInt());
+		config.setKeepaliveTime(Config.DATABASE_POOL_KEEPALIVETIME.getLong());
+		config.setMinimumIdle(Config.DATABASE_POOL_MINIMUMIDLE.getInt());
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "250");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

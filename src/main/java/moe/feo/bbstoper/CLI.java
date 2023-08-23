@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -147,7 +147,7 @@ public class CLI implements TabExecutor {
 						boolean isrecording = true;
 						if (poster != null) {
 							long cd = System.currentTimeMillis() - poster.getBinddate();// 已经过了的cd
-							long settedcd = Option.MCBBS_CHANGEIDCOOLDOWN.getInt() * (long) 86400000;// 设置的cd
+							long settedcd = Config.MCBBS_CHANGEIDCOOLDOWN.getInt() * (long) 86400000;// 设置的cd
 							if (cd < settedcd) {// 如果还在cd那么直接return;
 								long leftcd = settedcd - cd;// 剩下的cd
 								long leftcdtodays = leftcd / 86400000;
@@ -260,7 +260,7 @@ public class CLI implements TabExecutor {
 									poster.setRewardbefore(datenow);
 									poster.setRewardtime(0);
 								}
-								if (poster.getRewardtime() < Option.REWARD_TIMES.getInt()) {// 奖励次数小于设定值
+								if (poster.getRewardtime() < Config.REWARD_TIMES.getInt()) {// 奖励次数小于设定值
 									new Reward((Player) sender, crawler, i).award();
 									DatabaseManager.connection.addTopState(poster.getBbsname(), crawler.Time.get(i));
 									poster.setRewardtime(poster.getRewardtime() + 1);// rewardtime次数加一
@@ -281,7 +281,7 @@ public class CLI implements TabExecutor {
 						}
 					}
 					if (isovertime) {
-						int rewardtimes = Option.REWARD_TIMES.getInt();
+						int rewardtimes = Config.REWARD_TIMES.getInt();
 						sender.sendMessage(Message.PREFIX.getString() + Message.OVERTIME.getString()
 								.replaceAll("%REWARDTIMES%", Integer.toString(rewardtimes)));
 					}
@@ -369,15 +369,15 @@ public class CLI implements TabExecutor {
 						}
 						return;
 					}
-					int totalpage = (int) Math.ceil((double) crawler.ID.size() / Option.MCBBS_PAGESIZE.getInt());
+					int totalpage = (int) Math.ceil((double) crawler.ID.size() / Config.MCBBS_PAGESIZE.getInt());
 					if (page > totalpage) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.OVERPAGE.getString());
 						return;
 					}
 					List<String> msglist = new ArrayList<>();
 					msglist.add(Message.PREFIX.getString() + Message.POSTERNUM.getString() + ":" + crawler.ID.size());
-					for (int i = (page - 1) * Option.MCBBS_PAGESIZE.getInt(); i < page
-							* Option.MCBBS_PAGESIZE.getInt(); i++) {
+					for (int i = (page - 1) * Config.MCBBS_PAGESIZE.getInt(); i < page
+							* Config.MCBBS_PAGESIZE.getInt(); i++) {
 						if (i >= crawler.ID.size())
 							break;// 当i不再小于顶贴人数，该停了
 						msglist.add(Message.POSTERID.getString() + ":" + crawler.ID.get(i) + " "
@@ -431,15 +431,15 @@ public class CLI implements TabExecutor {
 					}
 					List<Poster> posterlist = DatabaseManager.connection.getTopPosters();
 					posterlist.addAll(DatabaseManager.connection.getNoCountPosters());
-					int totalpage = (int) Math.ceil((double) posterlist.size() / Option.MCBBS_PAGESIZE.getInt());
+					int totalpage = (int) Math.ceil((double) posterlist.size() / Config.MCBBS_PAGESIZE.getInt());
 					if (page > totalpage) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.OVERPAGE.getString());
 						return;
 					}
 					List<String> msglist = new ArrayList<>();
 					msglist.add(Message.PREFIX.getString() + Message.POSTERTOTAL.getString() + ":" + posterlist.size());
-					for (int i = (page - 1) * Option.MCBBS_PAGESIZE.getInt(); i < page
-							* Option.MCBBS_PAGESIZE.getInt(); i++) {
+					for (int i = (page - 1) * Config.MCBBS_PAGESIZE.getInt(); i < page
+							* Config.MCBBS_PAGESIZE.getInt(); i++) {
 						if (i >= posterlist.size())
 							break;// 当i不再小于顶贴人数，该停了
 						Poster poster = posterlist.get(i);
@@ -464,7 +464,7 @@ public class CLI implements TabExecutor {
 						return;
 					}
 					BBSToper.INSTANCE.saveDefaultConfig();
-					Option.load();
+					Config.load();
 					Message.load();
 					DatabaseManager.initializeDatabase();
 					DatabaseManager.startTimingReconnect();
@@ -550,7 +550,7 @@ public class CLI implements TabExecutor {
 	}
 
 	public double getQueryCooldown(UUID uuid) {
-		int cooldown = Option.MCBBS_QUERYCOOLDOWN.getInt() * 1000;
+		int cooldown = Config.MCBBS_QUERYCOOLDOWN.getInt() * 1000;
 		long now = System.currentTimeMillis();
 		Long before = queryrecord.get(uuid);
 		if (before == null) {

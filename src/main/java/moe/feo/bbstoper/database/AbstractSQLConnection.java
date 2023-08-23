@@ -1,6 +1,6 @@
 package moe.feo.bbstoper.database;
 
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.Poster;
 
 import java.sql.Connection;
@@ -19,7 +19,7 @@ public abstract class AbstractSQLConnection {
 	public static final Lock writelock = lock.writeLock();
 
 	public String getTableName(String name) {// 获取数据表应有的名字
-		return Option.DATABASE_PREFIX.getString() + name;
+		return Config.DATABASE_PREFIX.getString() + name;
 	}
 
 	public void addPoster(Poster poster) {

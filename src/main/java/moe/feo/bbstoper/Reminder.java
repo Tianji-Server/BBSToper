@@ -1,7 +1,7 @@
 package moe.feo.bbstoper;
 
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,7 +23,7 @@ public class Reminder implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (!Option.MCBBS_JOINMESSAGE.getBoolean()) {// 如果设置了不提示消息则直接返回
+		if (!Config.MCBBS_JOINMESSAGE.getBoolean()) {// 如果设置了不提示消息则直接返回
 			return;
 		}
 		new BukkitRunnable() {// 这里由于牵涉到数据库IO, 主线程执行可能会卡顿，所以改成异步
@@ -54,7 +54,7 @@ public class Reminder implements Listener {
 					if (extra != null) {// 说明有额外奖励信息
 						list.add(Message.EXTRAINFO.getString().replaceAll("%EXTRA%", extra));
 					}
-					String url = Option.MCBBS_LINK.getString() + "thread-" + Option.MCBBS_URL.getString() + "-1-1.html";
+					String url = Config.MCBBS_LINK.getString() + "thread-" + Config.MCBBS_URL.getString() + "-1-1.html";
 					for (String msg : list) {
 						event.getPlayer().sendMessage(Message.PREFIX.getString() + msg.replaceAll("%PAGE%", url));
 					}

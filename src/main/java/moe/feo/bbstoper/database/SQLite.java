@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import me.dreamvoid.bbstoper.Utils;
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 
 import java.io.File;
 import java.sql.Connection;
@@ -45,13 +45,13 @@ public class SQLite extends AbstractSQLConnection {
 
 		HikariConfig config = new HikariConfig();
 		config.setDriverClassName(driver);
-		config.setJdbcUrl("jdbc:sqlite:" + Option.DATABASE_SQLITE_FOLDER.getString().replaceAll("%PLUGIN_FOLDER%", "%s") + File.separator + Option.DATABASE_SQLITE_DATABASE.getString());
-		config.setConnectionTimeout(Option.DATABASE_POOL_CONNECTIONTIMEOUT.getLong());
-		config.setIdleTimeout(Option.DATABASE_POOL_IDLETIMEOUT.getLong());
-		config.setMaxLifetime(Option.DATABASE_POOL_MAXLIFETIME.getLong());
-		config.setMaximumPoolSize(Option.DATABASE_POOL_MAXIUMPOOLSIZE.getInt());
-		config.setKeepaliveTime(Option.DATABASE_POOL_KEEPALIVETIME.getLong());
-		config.setMinimumIdle(Option.DATABASE_POOL_MINIMUMIDLE.getInt());
+		config.setJdbcUrl("jdbc:sqlite:" + Config.DATABASE_SQLITE_FOLDER.getString().replaceAll("%PLUGIN_FOLDER%", "%s") + File.separator + Config.DATABASE_SQLITE_DATABASE.getString());
+		config.setConnectionTimeout(Config.DATABASE_POOL_CONNECTIONTIMEOUT.getLong());
+		config.setIdleTimeout(Config.DATABASE_POOL_IDLETIMEOUT.getLong());
+		config.setMaxLifetime(Config.DATABASE_POOL_MAXLIFETIME.getLong());
+		config.setMaximumPoolSize(Config.DATABASE_POOL_MAXIUMPOOLSIZE.getInt());
+		config.setKeepaliveTime(Config.DATABASE_POOL_KEEPALIVETIME.getLong());
+		config.setMinimumIdle(Config.DATABASE_POOL_MINIMUMIDLE.getInt());
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "250");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

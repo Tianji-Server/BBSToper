@@ -1,7 +1,7 @@
 package moe.feo.bbstoper;
 
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -30,9 +30,9 @@ public class Crawler {
 	}
 
 	public void resolveWebData() {
-		String url = Option.MCBBS_LINK.getString() + "forum.php?mod=misc&action=viewthreadmod&tid=" + Option.MCBBS_URL.getString() + "&mobile=no";
+		String url = Config.MCBBS_LINK.getString() + "forum.php?mod=misc&action=viewthreadmod&tid=" + Config.MCBBS_URL.getString() + "&mobile=no";
 		try {
-			Document doc = Option.PROXY_ENABLE.getBoolean() ? Jsoup.connect(url).proxy(Option.PROXY_IP.getString(), Option.PROXY_PORT.getInt()).get() : Jsoup.connect(url).get();
+			Document doc = Config.PROXY_ENABLE.getBoolean() ? Jsoup.connect(url).proxy(Config.PROXY_IP.getString(), Config.PROXY_PORT.getInt()).get() : Jsoup.connect(url).get();
 			Elements listClass = doc.getElementsByClass("list"); // 获取一个class名为list的元素的合集
 
 			Element list = listClass.get(0); // mcbbs顶贴列表页面只会有一个list，直接使用即可
@@ -56,7 +56,7 @@ public class Crawler {
 				Time.add(time);
 			}
 		} catch (IOException e) {// 这里经常会因为网络连接不顺畅而报错
-			if (Option.DEBUG.getBoolean()) e.printStackTrace();
+			if (Config.DEBUG.getBoolean()) e.printStackTrace();
 			BBSToper.INSTANCE.getLogger().warning(Message.FAILEDGETWEB.getString());
 		} catch (IndexOutOfBoundsException e) {
 			this.visible = false;
@@ -71,7 +71,7 @@ public class Crawler {
 		// 注意mcbbs的日期格式，月份和天数都是非零开始，小时分钟是从零开始
 		SimpleDateFormat sdfm = new SimpleDateFormat("yyyy-M-d HH:mm");
 		Date now = new Date();
-		long validtime = Option.REWARD_PERIOD.getInt() * 24 * 60 * 60 * 1000L;// 有效期
+		long validtime = Config.REWARD_PERIOD.getInt() * 24 * 60 * 60 * 1000L;// 有效期
 		Date expirydate = new Date(now.getTime() - validtime);// 过期时间，如果小于这个时间则表示过期
 		for (int i = 0; i < Time.size(); i++) {
 			try {
@@ -82,7 +82,7 @@ public class Crawler {
 					i--;// 这里要吧序数往前退一个
 				}
 			} catch (ParseException e) {
-				if (Option.DEBUG.getBoolean()) e.printStackTrace();
+				if (Config.DEBUG.getBoolean()) e.printStackTrace();
 				return;
 			}
 		}
@@ -108,7 +108,7 @@ public class Crawler {
 						poster.setRewardbefore(dateNow);// 奖励日期设置为今天
 						poster.setRewardtime(0);
 					}
-					if (poster.getRewardtime() >= Option.REWARD_TIMES.getInt()) {
+					if (poster.getRewardtime() >= Config.REWARD_TIMES.getInt()) {
 						continue;// 如果领奖次数已经大于设定值了，那么跳出循环
 					}
 

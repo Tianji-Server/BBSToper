@@ -11,7 +11,7 @@ import org.bukkit.plugin.Plugin;
 
 import moe.feo.bbstoper.CLI;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -33,7 +33,7 @@ public class InventoryListener implements Listener {
 
 		switch (event.getRawSlot()){
 			case 12: { // 点击绑定
-				if (Option.GUI_USECHATGETID.getBoolean()) {
+				if (Config.GUI_USECHATGETID.getBoolean()) {
 					player.closeInventory();
 					UUID uid = player.getUniqueId();
 					synchronized (IDListener.lock) { // 线程锁防止异步错位修改
@@ -41,12 +41,12 @@ public class InventoryListener implements Listener {
 						// 如果这个玩家没有一个监听器
 						if (rgListener == null) {
 							new IDListener(player.getUniqueId()).register();// 为此玩家创建一个监听器
-							String keywords = Arrays.toString(Option.GUI_CANCELKEYWORDS.getStringList().toArray());
+							String keywords = Arrays.toString(Config.GUI_CANCELKEYWORDS.getStringList().toArray());
 							player.sendMessage(Message.PREFIX.getString() + Message.ENTER.getString().replaceAll("%KEYWORD%", keywords));
 						}
 					}
 				}
-				if (!Option.GUI_USECHATGETID.getBoolean()) {
+				if (!Config.GUI_USECHATGETID.getBoolean()) {
 					player.closeInventory();
 					player.sendMessage(Message.PREFIX.getString() + Message.HELP_BINDING.getString());
 				}
@@ -61,7 +61,7 @@ public class InventoryListener implements Listener {
 			case 22:{ // 获取链接
 				player.closeInventory();
 				for (String msg : Message.CLICKPOSTICON.getStringList()) {
-					String url = Option.MCBBS_LINK.getString() + "thread-" + Option.MCBBS_URL.getString() + "-1-1.html";
+					String url = Config.MCBBS_LINK.getString() + "thread-" + Config.MCBBS_URL.getString() + "-1-1.html";
 					player.sendMessage(msg.replaceAll("%PAGE%", url));
 				}
 				break;
