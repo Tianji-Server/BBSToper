@@ -1,7 +1,11 @@
-package moe.feo.bbstoper;
+package moe.feo.bbstoper.listener;
 
+import moe.feo.bbstoper.BBSToper;
+import moe.feo.bbstoper.Crawler;
+import moe.feo.bbstoper.Poster;
+import moe.feo.bbstoper.Util;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,7 +27,7 @@ public class Reminder implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (!Option.MCBBS_JOINMESSAGE.getBoolean()) {// 如果设置了不提示消息则直接返回
+		if (!Config.MCBBS_JOINMESSAGE.getBoolean()) {// 如果设置了不提示消息则直接返回
 			return;
 		}
 		new BukkitRunnable() {// 这里由于牵涉到数据库IO, 主线程执行可能会卡顿，所以改成异步
@@ -38,7 +42,7 @@ public class Reminder implements Listener {
 				boolean isbinded = true;// 是否绑定
 				boolean isposted = true;// 是否有顶贴者
 				UUID uuid = event.getPlayer().getUniqueId();
-				Poster poster = DatabaseManager.connection.getPoster(uuid.toString());
+				Poster poster = DatabaseManager.database.getPoster(uuid.toString());
 				String datenow = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 				if (poster == null) {// 玩家未绑定
 					isbinded = false;
@@ -54,7 +58,7 @@ public class Reminder implements Listener {
 					if (extra != null) {// 说明有额外奖励信息
 						list.add(Message.EXTRAINFO.getString().replaceAll("%EXTRA%", extra));
 					}
-					String url = Option.MCBBS_LINK.getString() + "thread-" + Option.MCBBS_URL.getString() + "-1-1.html";
+					String url = Config.MCBBS_LINK.getString() + "thread-" + Config.MCBBS_URL.getString() + "-1-1.html";
 					for (String msg : list) {
 						event.getPlayer().sendMessage(Message.PREFIX.getString() + msg.replaceAll("%PAGE%", url));
 					}

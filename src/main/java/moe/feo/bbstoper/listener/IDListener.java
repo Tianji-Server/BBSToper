@@ -14,7 +14,7 @@
  *		  void register();
  */
 
-package moe.feo.bbstoper.gui;
+package moe.feo.bbstoper.listener;
 
 import java.util.*;
 import org.bukkit.command.CommandSender;
@@ -31,7 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.CLI;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.Util;
 
 public class IDListener extends RegisteredListener implements Listener, EventExecutor {
@@ -111,7 +111,7 @@ public class IDListener extends RegisteredListener implements Listener, EventExe
 		Player player = event.getPlayer();
 		String msg = event.getMessage();
 		event.setCancelled(true);
-		List<String> cancelkeywords = Option.GUI_CANCELKEYWORDS.getStringList();// 取消绑定关键词
+		List<String> cancelkeywords = Config.GUI_CANCELKEYWORDS.getStringList();// 取消绑定关键词
 		if (cancelkeywords.contains(msg)) {// 如果关键词中包含这次输入的消息
 			unregister();// 取消监听事件
 			CLI.getInstance().getCache().put(player.getUniqueId().toString(), null);// 清理这个键

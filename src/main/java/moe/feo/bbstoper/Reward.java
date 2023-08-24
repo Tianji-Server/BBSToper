@@ -1,7 +1,7 @@
 package moe.feo.bbstoper;
 
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -21,9 +21,9 @@ public class Reward {
 	// current指需要判断的时间, before指上一个顶贴的时间
 	public static boolean canIncentiveReward(Calendar current, Calendar before) {
 		boolean result = false;
-		if (Option.REWARD_INCENTIVEREWARD_ENABLE.getBoolean()) {// 开启了激励奖励
+		if (Config.REWARD_INCENTIVEREWARD_ENABLE.getBoolean()) {// 开启了激励奖励
 			Calendar copyofcurrent = (Calendar) before.clone();// 一个上次顶贴时间的副本
-			copyofcurrent.add(Calendar.MINUTE, Option.REWARD_INCENTIVEREWARD_PERIOD.getInt());// 加上设定好的激励时间
+			copyofcurrent.add(Calendar.MINUTE, Config.REWARD_INCENTIVEREWARD_PERIOD.getInt());// 加上设定好的激励时间
 			if (copyofcurrent.before(current)) {// 如果这个时间已经处于"当前领奖的记录"之前
 				result = true;
 			}
@@ -34,8 +34,8 @@ public class Reward {
 	// current指需要判断的时间
 	public static boolean canOffDayReward(Calendar current) {
 		boolean result = false;
-		if (Option.REWARD_OFFDAYREWARD_ENABLE.getBoolean()) {// 开启了休息日奖励
-			for (String day : Option.REWARD_OFFDAYREWARD_OFFDAYS.getStringList()) {
+		if (Config.REWARD_OFFDAYREWARD_ENABLE.getBoolean()) {// 开启了休息日奖励
+			for (String day : Config.REWARD_OFFDAYREWARD_OFFDAYS.getStringList()) {
 				Pattern upcasepattern = Pattern.compile("^[A-Z]+$");// 全大写英文字符串
 				Pattern datepattern = Pattern.compile("^\\d{2}-\\d{2}$");// 00-00格式的字符串
 				if (upcasepattern.matcher(day).matches()) {// 如果是全大写英文字符
@@ -87,7 +87,7 @@ public class Reward {
 				Date lastDate = bbsformat.parse(crawler.Time.get(x));
 				// 遍历再上一次的顶贴时间
 				// 当这次遍历到的时间减去当前领奖的时间已经大于设定的时间了，就不用继续遍历了
-				if ((thispostdate.getTime() - lastDate.getTime()) / (1000 * 60) > Option.REWARD_INTERVAL.getInt()) {
+				if ((thispostdate.getTime() - lastDate.getTime()) / (1000 * 60) > Config.REWARD_INTERVAL.getInt()) {
 					break;
 				}
 				// 当遍历到和这次领奖记录的bbsid一样的记录，说明这个人顶贴间隔小于设定时间了
@@ -121,9 +121,9 @@ public class Reward {
 			e.printStackTrace();
 		}
 		// 如果顶贴间隔短于设定值则不进行操作
-		if (Option.REWARD_INTERVAL.getInt() > 0 && isIntervalTooShort(thispost, index)) {
+		if (Config.REWARD_INTERVAL.getInt() > 0 && isIntervalTooShort(thispost, index)) {
 			player.sendMessage(Message.PREFIX.getString() + Message.INTERVALTOOSHORT.getString()
-			.replaceAll("%TIME%", crawler.Time.get(index)).replaceAll("%INTERVAL%", Option.REWARD_INTERVAL.getString()));
+			.replaceAll("%TIME%", crawler.Time.get(index)).replaceAll("%INTERVAL%", Config.REWARD_INTERVAL.getString()));
 			return;
 		}
 		Calendar lastpost = Calendar.getInstance();// 上一次顶贴的时间
@@ -146,30 +146,30 @@ public class Reward {
 		String extra = null;
 		if (incentive) {// 如果激励奖励条件达成
 			// 如果休息日奖励也达成了, 并且激励奖励和休息日奖励都不是额外奖励, 不会发放激励奖励(只会发放休息日奖励)
-			if (!(offday && !Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()
-					&& !Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean())) {
-				cmds.addAll(Option.REWARD_INCENTIVEREWARD_COMMANDS.getStringList());
+			if (!(offday && !Config.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()
+					&& !Config.REWARD_OFFDAYREWARD_EXTRA.getBoolean())) {
+				cmds.addAll(Config.REWARD_INCENTIVEREWARD_COMMANDS.getStringList());
 				extra = Message.GUI_INCENTIVEREWARDS.getString();
 			}
-			if (!Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()) {
+			if (!Config.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()) {
 				// 如果这不是额外奖励, 则普通奖励不会发放
 				normal = false;
 			}
 		}
 		if (offday) {// 如果休息日奖励条件达成
-			cmds.addAll(Option.REWARD_OFFDAYREWARD_COMMANDS.getStringList());
+			cmds.addAll(Config.REWARD_OFFDAYREWARD_COMMANDS.getStringList());
 			if (extra == null) {
 				extra = Message.GUI_OFFDAYREWARDS.getString();
 			} else {
 				extra = extra + "+" + Message.GUI_OFFDAYREWARDS.getString();
 			}
-			if (!Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean()) {
+			if (!Config.REWARD_OFFDAYREWARD_EXTRA.getBoolean()) {
 				// 如果这不是额外奖励, 则普通奖励不会发放
 				normal = false;
 			}
 		}
 		if (normal) {
-			cmds.addAll(Option.REWARD_COMMANDS.getStringList());
+			cmds.addAll(Config.REWARD_COMMANDS.getStringList());
 		}
 		// 让主线程执行
 		Bukkit.getScheduler().runTask(BBSToper.INSTANCE, () -> {
@@ -191,15 +191,15 @@ public class Reward {
 		List<String> cmds = new ArrayList<>();
 		switch (type) {
 			case "NORMAL": {
-				cmds.addAll(Option.REWARD_COMMANDS.getStringList());
+				cmds.addAll(Config.REWARD_COMMANDS.getStringList());
 				break;
 			}
 			case "INCENTIVE": {
-				cmds.addAll(Option.REWARD_INCENTIVEREWARD_COMMANDS.getStringList());
+				cmds.addAll(Config.REWARD_INCENTIVEREWARD_COMMANDS.getStringList());
 				break;
 			}
 			case "OFFDAY": {
-				cmds.addAll(Option.REWARD_OFFDAYREWARD_COMMANDS.getStringList());
+				cmds.addAll(Config.REWARD_OFFDAYREWARD_COMMANDS.getStringList());
 				break;
 			}
 		}

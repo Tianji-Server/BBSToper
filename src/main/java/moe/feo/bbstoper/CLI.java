@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import moe.feo.bbstoper.gui.GUI;
-import moe.feo.bbstoper.gui.IDListener;
+import moe.feo.bbstoper.listener.IDListener;
 
 public class CLI implements TabExecutor {
 	private final Map<String, String> cache = new HashMap<>();// 这个map是为了暂存玩家的绑定信息的
@@ -143,11 +143,11 @@ public class CLI implements TabExecutor {
 					if (args.length == 2) {
 						Player player = Bukkit.getPlayer(sender.getName());
 						String uuid = player.getUniqueId().toString();
-						Poster poster = DatabaseManager.connection.getPoster(uuid);
+						Poster poster = DatabaseManager.database.getPoster(uuid);
 						boolean isrecording = true;
 						if (poster != null) {
 							long cd = System.currentTimeMillis() - poster.getBinddate();// 已经过了的cd
-							long settedcd = Option.MCBBS_CHANGEIDCOOLDOWN.getInt() * (long) 86400000;// 设置的cd
+							long settedcd = Config.MCBBS_CHANGEIDCOOLDOWN.getInt() * (long) 86400000;// 设置的cd
 							if (cd < settedcd) {// 如果还在cd那么直接return;
 								long leftcd = settedcd - cd;// 剩下的cd
 								long leftcdtodays = leftcd / 86400000;
@@ -160,7 +160,7 @@ public class CLI implements TabExecutor {
 							poster = new Poster();
 							isrecording = false;
 						}
-						String ownersuuid = DatabaseManager.connection.bbsNameCheck(args[1]);
+						String ownersuuid = DatabaseManager.database.bbsNameCheck(args[1]);
 						if (ownersuuid == null) {// 没有人绑定过这个论坛id
 							if (cache.get(uuid) != null && cache.get(uuid).equals(args[1])) {
 								poster.setUuid(uuid);
@@ -168,9 +168,9 @@ public class CLI implements TabExecutor {
 								poster.setBbsname(args[1]);
 								poster.setBinddate(System.currentTimeMillis());
 								if (isrecording) {
-									DatabaseManager.connection.updatePoster(poster);
+									DatabaseManager.database.updatePoster(poster);
 								} else {
-									DatabaseManager.connection.addPoster(poster);
+									DatabaseManager.database.addPoster(poster);
 								}
 								cache.put(uuid, null);// 绑定成功, 清理这个键
 								sender.sendMessage(Message.PREFIX.getString() + Message.BINDINGSUCCESS.getString());
@@ -212,7 +212,7 @@ public class CLI implements TabExecutor {
 					}
 					Player player = Bukkit.getPlayer(sender.getName());
 					String uuid = player.getUniqueId().toString();
-					Poster poster = DatabaseManager.connection.getPoster(uuid);
+					Poster poster = DatabaseManager.database.getPoster(uuid);
 					if (poster == null) {// 没有绑定
 						sender.sendMessage(Message.PREFIX.getString() + Message.NOTBOUND.getString());
 						sender.sendMessage(Message.PREFIX.getString() + Message.HELP_BINDING.getString());
@@ -260,9 +260,9 @@ public class CLI implements TabExecutor {
 									poster.setRewardbefore(datenow);
 									poster.setRewardtime(0);
 								}
-								if (poster.getRewardtime() < Option.REWARD_TIMES.getInt()) {// 奖励次数小于设定值
+								if (poster.getRewardtime() < Config.REWARD_TIMES.getInt()) {// 奖励次数小于设定值
 									new Reward((Player) sender, crawler, i).award();
-									DatabaseManager.connection.addTopState(poster.getBbsname(), crawler.Time.get(i));
+									DatabaseManager.database.addTopState(poster.getBbsname(), crawler.Time.get(i));
 									poster.setRewardtime(poster.getRewardtime() + 1);// rewardtime次数加一
 									issucceed = true;
 								} else {
@@ -271,7 +271,7 @@ public class CLI implements TabExecutor {
 							}
 						}
 					}
-					DatabaseManager.connection.updatePoster(poster);// 更新poster
+					DatabaseManager.database.updatePoster(poster);// 更新poster
 					if (issucceed) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.REWARDGIVED.getString());
 						for (Player p :Bukkit.getOnlinePlayers()) {// 给有奖励权限且能看见此玩家(防止Vanish)的玩家广播
@@ -281,7 +281,7 @@ public class CLI implements TabExecutor {
 						}
 					}
 					if (isovertime) {
-						int rewardtimes = Option.REWARD_TIMES.getInt();
+						int rewardtimes = Config.REWARD_TIMES.getInt();
 						sender.sendMessage(Message.PREFIX.getString() + Message.OVERTIME.getString()
 								.replaceAll("%REWARDTIMES%", Integer.toString(rewardtimes)));
 					}
@@ -369,15 +369,15 @@ public class CLI implements TabExecutor {
 						}
 						return;
 					}
-					int totalpage = (int) Math.ceil((double) crawler.ID.size() / Option.MCBBS_PAGESIZE.getInt());
+					int totalpage = (int) Math.ceil((double) crawler.ID.size() / Config.MCBBS_PAGESIZE.getInt());
 					if (page > totalpage) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.OVERPAGE.getString());
 						return;
 					}
 					List<String> msglist = new ArrayList<>();
 					msglist.add(Message.PREFIX.getString() + Message.POSTERNUM.getString() + ":" + crawler.ID.size());
-					for (int i = (page - 1) * Option.MCBBS_PAGESIZE.getInt(); i < page
-							* Option.MCBBS_PAGESIZE.getInt(); i++) {
+					for (int i = (page - 1) * Config.MCBBS_PAGESIZE.getInt(); i < page
+							* Config.MCBBS_PAGESIZE.getInt(); i++) {
 						if (i >= crawler.ID.size())
 							break;// 当i不再小于顶贴人数，该停了
 						msglist.add(Message.POSTERID.getString() + ":" + crawler.ID.get(i) + " "
@@ -429,17 +429,17 @@ public class CLI implements TabExecutor {
 						sender.sendMessage(Message.PREFIX.getString() + Message.HELP_TOP.getString());
 						return;
 					}
-					List<Poster> posterlist = DatabaseManager.connection.getTopPosters();
-					posterlist.addAll(DatabaseManager.connection.getNoCountPosters());
-					int totalpage = (int) Math.ceil((double) posterlist.size() / Option.MCBBS_PAGESIZE.getInt());
+					List<Poster> posterlist = DatabaseManager.database.getTopPosters();
+					posterlist.addAll(DatabaseManager.database.getNoCountPosters());
+					int totalpage = (int) Math.ceil((double) posterlist.size() / Config.MCBBS_PAGESIZE.getInt());
 					if (page > totalpage) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.OVERPAGE.getString());
 						return;
 					}
 					List<String> msglist = new ArrayList<>();
 					msglist.add(Message.PREFIX.getString() + Message.POSTERTOTAL.getString() + ":" + posterlist.size());
-					for (int i = (page - 1) * Option.MCBBS_PAGESIZE.getInt(); i < page
-							* Option.MCBBS_PAGESIZE.getInt(); i++) {
+					for (int i = (page - 1) * Config.MCBBS_PAGESIZE.getInt(); i < page
+							* Config.MCBBS_PAGESIZE.getInt(); i++) {
 						if (i >= posterlist.size())
 							break;// 当i不再小于顶贴人数，该停了
 						Poster poster = posterlist.get(i);
@@ -464,7 +464,7 @@ public class CLI implements TabExecutor {
 						return;
 					}
 					BBSToper.INSTANCE.saveDefaultConfig();
-					Option.load();
+					Config.load();
 					Message.load();
 					DatabaseManager.initializeDatabase();
 					DatabaseManager.startTimingReconnect();
@@ -484,7 +484,7 @@ public class CLI implements TabExecutor {
 					}
 					switch (args[1].toLowerCase()) {
 					case "bbsid": {
-						String owneruuid = DatabaseManager.connection.bbsNameCheck(args[2]);
+						String owneruuid = DatabaseManager.database.bbsNameCheck(args[2]);
 						if (owneruuid == null) {
 							sender.sendMessage(Message.PREFIX.getString() + Message.IDNOTFOUND.getString());
 							return;
@@ -498,7 +498,7 @@ public class CLI implements TabExecutor {
 					case "player": {
 						@SuppressWarnings("deprecation")
 						UUID owneruuid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
-						Poster poster = DatabaseManager.connection.getPoster(owneruuid.toString());
+						Poster poster = DatabaseManager.database.getPoster(owneruuid.toString());
 						if (poster == null) {
 							sender.sendMessage(Message.PREFIX.getString() + Message.OWNERNOTFOUND.getString());
 							return;
@@ -522,12 +522,12 @@ public class CLI implements TabExecutor {
 					}
 					@SuppressWarnings("deprecation")
 					UUID uuid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-					Poster poster = DatabaseManager.connection.getPoster(uuid.toString());
+					Poster poster = DatabaseManager.database.getPoster(uuid.toString());
 					if (poster == null) {
 						sender.sendMessage(Message.PREFIX.getString() + Message.OWNERNOTFOUND.getString());
 						return;
 					}
-					DatabaseManager.connection.deletePoster(uuid.toString());
+					DatabaseManager.database.deletePoster(uuid.toString());
 					sender.sendMessage(Message.PREFIX.getString() + Message.DELETESUCCESS.getString());
 					return;
 				}
@@ -550,7 +550,7 @@ public class CLI implements TabExecutor {
 	}
 
 	public double getQueryCooldown(UUID uuid) {
-		int cooldown = Option.MCBBS_QUERYCOOLDOWN.getInt() * 1000;
+		int cooldown = Config.MCBBS_QUERYCOOLDOWN.getInt() * 1000;
 		long now = System.currentTimeMillis();
 		Long before = queryrecord.get(uuid);
 		if (before == null) {

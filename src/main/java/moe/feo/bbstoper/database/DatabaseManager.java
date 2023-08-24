@@ -2,44 +2,51 @@ package moe.feo.bbstoper.database;
 
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.Util;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class DatabaseManager {
-	public static AbstractSQLConnection connection;
+	public static AbstractDatabase database;
 	private static BukkitTask timingReconnectTask;
 
 	public static void initializeDatabase() {// 初始化或重载数据库
 		try {
-			AbstractSQLConnection.writelock.lock();
-			if (connection != null) {
-				connection.closeConnection();// 此方法会在已经建立过连接的情况下关闭连接
+			AbstractDatabase.writelock.lock();
+			if (database != null) database.closeConnection();// 此方法会在已经建立过连接的情况下关闭连接
+
+			switch (Config.DATABASE_TYPE.getString().toLowerCase()){
+				case "sqlite":
+				default:{
+					database = new SQLite();
+					break;
+				}
+				case "mysql":{
+					database = new MySQL();
+					break;
+				}
 			}
-			if (Option.DATABASE_TYPE.getString().equalsIgnoreCase("mysql")) {
-				connection = new MySQL();
-			} else if (Option.DATABASE_TYPE.getString().equalsIgnoreCase("sqlite")) {
-				connection = new SQLite();
-			}
-			connection.load();
+			database.connect();
+			database.createTablePosters();
+			database.createTableTopStates();
 		} catch (Exception e) {
-			BBSToper.INSTANCE.getLogger().severe("Failed to initialize databse: " + e);
-			if(Option.DEBUG.getBoolean()) e.printStackTrace();
+			BBSToper.INSTANCE.getLogger().severe("Failed to initialize database: " + e);
+			if(Config.DEBUG.getBoolean()) e.printStackTrace();
 		} finally {
-			AbstractSQLConnection.writelock.unlock();
+			AbstractDatabase.writelock.unlock();
 		}
 	}
 
-	public static void closeSQLer() {// 关闭数据库
-		connection.closeConnection();
-		connection = null;
+	public static void closeSQL() {// 关闭数据库
+		database.closeConnection();
+		database = null;
 	}
 
 	public static void startTimingReconnect() {// 自动重连数据库的方法
 		if (timingReconnectTask != null && !timingReconnectTask.isCancelled()) {// 将之前的任务取消(如果存在)
 			timingReconnectTask.cancel();
 		}
-		int period = Option.DATABASE_TIMINGRECONNECT.getInt() * 20;
+		int period = Config.DATABASE_TIMINGRECONNECT.getInt() * 20;
 		if (period > 0) {
 			timingReconnectTask = new BukkitRunnable() {
 				@Override

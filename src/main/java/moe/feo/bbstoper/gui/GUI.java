@@ -18,7 +18,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import moe.feo.bbstoper.BBSToper;
 import moe.feo.bbstoper.Crawler;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.Poster;
 import moe.feo.bbstoper.Util;
 
@@ -57,7 +57,7 @@ public class GUI {
 			skull = new ItemStack(Material.getMaterial("PLAYER_HEAD"), 1);
 		}
 		SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();// 玩家头颅
-		if (Option.GUI_DISPLAYHEADSKIN.getBoolean()) {// 如果开启了头颅显示，才会设置头颅的所有者
+		if (Config.GUI_DISPLAYHEADSKIN.getBoolean()) {// 如果开启了头颅显示，才会设置头颅的所有者
 			try {
 				skullMeta.setOwningPlayer(player);
 			} catch (NoSuchMethodError e) {// 这里为了照顾低版本
@@ -66,7 +66,7 @@ public class GUI {
 		}
 		skullMeta.setDisplayName(Message.GUI_SKULL.getString().replaceAll("%PLAYER%", player.getName()));
 		List<String> skullLores = new ArrayList<>();
-		Poster poster = DatabaseManager.connection.getPoster(player.getUniqueId().toString());
+		Poster poster = DatabaseManager.database.getPoster(player.getUniqueId().toString());
 		if (poster != null) {
 			skullLores.add(Message.GUI_BBSID.getString().replaceAll("%BBSID%", poster.getBbsname()));
 			skullLores.add(Message.GUI_POSTTIMES.getString().replaceAll("%TIMES%", String.valueOf(poster.getTopStates().size())));
@@ -89,14 +89,14 @@ public class GUI {
 		sunflowerMeta.setDisplayName(Message.GUI_REWARDS.getString());
 		List<String> sunflowerLores = new ArrayList<>(Message.GUI_REWARDSINFO.getStringList());// 自定义奖励信息
 		if (sunflowerLores.isEmpty()) {// 如果没有自定义奖励信息
-			sunflowerLores.addAll(Option.REWARD_COMMANDS.getStringList());// 直接显示命令
-			if (Option.REWARD_INCENTIVEREWARD_ENABLE.getBoolean()) {
+			sunflowerLores.addAll(Config.REWARD_COMMANDS.getStringList());// 直接显示命令
+			if (Config.REWARD_INCENTIVEREWARD_ENABLE.getBoolean()) {
 				sunflowerLores.add(Message.GUI_INCENTIVEREWARDS.getString());// 激励奖励
-				sunflowerLores.addAll(Option.REWARD_INCENTIVEREWARD_COMMANDS.getStringList());// 激励奖励命令
+				sunflowerLores.addAll(Config.REWARD_INCENTIVEREWARD_COMMANDS.getStringList());// 激励奖励命令
 			}
-			if (Option.REWARD_OFFDAYREWARD_ENABLE.getBoolean()) {
+			if (Config.REWARD_OFFDAYREWARD_ENABLE.getBoolean()) {
 				sunflowerLores.add(Message.GUI_OFFDAYREWARDS.getString());// 休息日奖励
-				sunflowerLores.addAll(Option.REWARD_OFFDAYREWARD_COMMANDS.getStringList()); // 休息日奖励命令
+				sunflowerLores.addAll(Config.REWARD_OFFDAYREWARD_COMMANDS.getStringList()); // 休息日奖励命令
 			}
 		}
 		sunflowerLores.add(Message.GUI_CLICKGET.getString());
@@ -108,9 +108,9 @@ public class GUI {
 		ItemMeta starMeta = star.getItemMeta();
 		starMeta.setDisplayName(Message.GUI_TOPS.getString());
 		List<String> starLore = new ArrayList<>();
-		List<Poster> posters = DatabaseManager.connection.getTopPosters();
+		List<Poster> posters = DatabaseManager.database.getTopPosters();
 		for (int i = 0; i < posters.size(); i++) {
-			if (i >= Option.GUI_TOPPLAYERS.getInt())
+			if (i >= Config.GUI_TOPPLAYERS.getInt())
 				break;
 			starLore.add(Message.POSTERPLAYER.getString() + ":" + posters.get(i).getName() + " "
 					+ Message.POSTERID.getString() + ":" + posters.get(i).getBbsname() + " "
@@ -124,7 +124,7 @@ public class GUI {
 		ItemMeta compassMeta = compass.getItemMeta();
 		compassMeta.setDisplayName(Message.GUI_PAGESTATE.getString());
 		List<String> compassLore = new ArrayList<>();
-		compassLore.add(Message.GUI_PAGEID.getString().replaceAll("%PAGEID%", Option.MCBBS_URL.getString()));
+		compassLore.add(Message.GUI_PAGEID.getString().replaceAll("%PAGEID%", Config.MCBBS_URL.getString()));
 		Crawler crawler = new Crawler();
 		// 如果帖子可视，就获取帖子最近一次顶贴
 		// 如果从没有人顶帖，就以“----”代替上次顶帖时间(原来不加判断直接get会报索引范围错误)

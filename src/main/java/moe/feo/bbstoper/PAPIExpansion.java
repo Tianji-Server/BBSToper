@@ -2,7 +2,7 @@ package moe.feo.bbstoper;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.database.DatabaseManager;
 import org.bukkit.entity.Player;
 
@@ -52,7 +52,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 	public String onPlaceholderRequest(Player player, String identifier) {
 		Poster poster;
 		if (player != null) {// 有玩家
-			poster = DatabaseManager.connection.getPoster(player.getUniqueId().toString());
+			poster = DatabaseManager.database.getPoster(player.getUniqueId().toString());
 			if (identifier.equals("bbsid")) {// BBS用户名
 				if (poster == null) {
 					return Message.GUI_NOTBOUND.getString();
@@ -69,10 +69,10 @@ public class PAPIExpansion extends PlaceholderExpansion {
 			}
 		}
 		if (identifier.equals("pageid")) {// 宣传贴id
-			return Option.MCBBS_URL.getString();
+			return Config.MCBBS_URL.getString();
 		}
 		if (identifier.equals("pageurl")) {// 宣传贴url
-			return Option.MCBBS_LINK.getString() + "thread-" + Option.MCBBS_URL.getString() + "-1-1.html";
+			return Config.MCBBS_LINK.getString() + "thread-" + Config.MCBBS_URL.getString() + "-1-1.html";
 		}
 		if (identifier.equals("lastpost")) {// 上一次顶贴时间
 			Crawler crawler = new Crawler();
@@ -97,7 +97,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
 		if (Pattern.matches(pattern, identifier)) {// 如果匹配这种格式
 			int rank = Integer.parseInt(identifier.split("_")[1]);
 			int index = rank - 1;
-			List<Poster> listposter = DatabaseManager.connection.getTopPosters();
+			List<Poster> listposter = DatabaseManager.database.getTopPosters();
 			if (index < listposter.size()) {
 				return Message.POSTERPLAYER.getString() + ":" + listposter.get(index).getName() + " "
 						+ Message.POSTERID.getString() + ":" + listposter.get(index).getBbsname() + " "

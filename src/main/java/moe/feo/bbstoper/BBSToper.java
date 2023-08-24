@@ -1,7 +1,8 @@
 package moe.feo.bbstoper;
 
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
+import moe.feo.bbstoper.listener.Reminder;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +18,7 @@ public class BBSToper extends JavaPlugin {
 		INSTANCE = this;
 		getLogger().info("Loading configuration.");
 		saveDefaultConfig();
-		Option.load();
+		Config.load();
 		saveResource("lang.yml", false);
 		Message.load();
 	}
@@ -50,7 +51,7 @@ public class BBSToper extends JavaPlugin {
 		Bukkit.getScheduler().cancelTasks(INSTANCE);
 		Thread thread = new Thread(() -> {
 			Util.waitForAllTask();// 此方法会阻塞
-			DatabaseManager.closeSQLer();
+			DatabaseManager.closeSQL();
 			INSTANCE = null;
 		});
 		thread.setDaemon(true);

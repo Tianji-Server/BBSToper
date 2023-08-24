@@ -1,7 +1,7 @@
 package moe.feo.bbstoper;
 
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
+import moe.feo.bbstoper.config.Config;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -28,7 +28,7 @@ public class Util {
 				autoRewardTask.cancel();// 将之前的任务取消
 			}
 		}
-		int period = Option.REWARD_AUTO.getInt() * 20;
+		int period = Config.REWARD_AUTO.getInt() * 20;
 		if (period > 0) {
 			autoRewardTask = new BukkitRunnable() {// 自动奖励，异步执行
 				@Override
@@ -96,8 +96,8 @@ public class Util {
 		String extra = null;
 		if (incentive) {
 			// 如果休息日奖励也达成了, 并且激励奖励和休息日奖励都不是额外奖励, 不会发放激励奖励(只会发放休息日奖励)
-			if (!(offday && !Option.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()
-					&& !Option.REWARD_OFFDAYREWARD_EXTRA.getBoolean())) {
+			if (!(offday && !Config.REWARD_INCENTIVEREWARD_EXTRA.getBoolean()
+					&& !Config.REWARD_OFFDAYREWARD_EXTRA.getBoolean())) {
 				extra = Message.GUI_INCENTIVEREWARDS.getString();
 			}
 		}

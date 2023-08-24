@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-public enum Option {
+public enum Config {
 	DEBUG("debug"),
 	DATABASE_TYPE("database.type"),
 	DATABASE_PREFIX("database.prefix"),
@@ -54,7 +54,7 @@ public enum Option {
 
 	private final String path;
 
-	Option(String path) {
+	Config(String path) {
 		this.path = path;
 	}
 

@@ -1,85 +1,54 @@
 package moe.feo.bbstoper.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import me.dreamvoid.bbstoper.Utils;
 import moe.feo.bbstoper.BBSToper;
+import moe.feo.bbstoper.config.Config;
 import moe.feo.bbstoper.config.Message;
-import moe.feo.bbstoper.config.Option;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
 
-public class SQLite extends AbstractSQLConnection {
+public class SQLite extends AbstractDatabase {
+	private HikariDataSource ds;
 
-	private final static SQLite sqler = new SQLite();
-	private Connection connection;
+	@Override
+	protected void connect() throws ClassNotFoundException {
+		String driver;
+		if(Utils.findClass("org.sqlite.JDBC")){
+			driver = "org.sqlite.JDBC";
+		} else throw new ClassNotFoundException("\"org.sqlite.JDBC\" not found.");
 
-	public static SQLite getInstance() {
-		return sqler;
+		HikariConfig config = new HikariConfig();
+		config.setDriverClassName(driver);
+		config.setJdbcUrl("jdbc:sqlite:" + Config.DATABASE_SQLITE_FOLDER.getString().replaceAll("%PLUGIN_FOLDER%", "%s") + File.separator + Config.DATABASE_SQLITE_DATABASE.getString());
+		config.setConnectionTimeout(Config.DATABASE_POOL_CONNECTIONTIMEOUT.getLong());
+		config.setIdleTimeout(Config.DATABASE_POOL_IDLETIMEOUT.getLong());
+		config.setMaxLifetime(Config.DATABASE_POOL_MAXLIFETIME.getLong());
+		config.setMaximumPoolSize(Config.DATABASE_POOL_MAXIUMPOOLSIZE.getInt());
+		config.setKeepaliveTime(Config.DATABASE_POOL_KEEPALIVETIME.getLong());
+		config.setMinimumIdle(Config.DATABASE_POOL_MINIMUMIDLE.getInt());
+		config.addDataSourceProperty("cachePrepStmts", "true");
+		config.addDataSourceProperty("prepStmtCacheSize", "250");
+		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+		ds = new HikariDataSource(config);
 	}
 
 	@Override
 	protected Connection getConnection() {
-		return this.connection;
+		try {
+			return ds.getConnection();
+		} catch (SQLException e) {
+			BBSToper.INSTANCE.getLogger().severe(Message.FAILEDCONNECTSQL.getString());
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	protected void closeConnection() {
-		try {
-			if (!connection.isClosed()) {// 如果连接没有关闭，则将关闭这个连接
-				connection.close();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		ds.close();
 	}
-
-	public String getUrl() {// 获取数据库url
-		String folder = BBSToper.INSTANCE.getDataFolder().getPath();// 获取插件文件夹
-		String path = Option.DATABASE_SQLITE_FOLDER.getString().replaceAll("%PLUGIN_FOLDER%", "%s");
-		String url = "jdbc:sqlite:" + path + File.separator + Option.DATABASE_SQLITE_DATABASE.getString();
-		return String.format(url, folder);
-	}
-
-	@Override
-	protected void load() {
-		connect();
-		createTablePosters();
-		createTableTopStates();
-	}
-
-	protected void connect() {
-		String driver = "org.sqlite.JDBC";
-		try {
-			Class.forName(driver);
-			this.connection = DriverManager.getConnection(getUrl());
-		} catch (ClassNotFoundException | SQLException e) {
-			BBSToper.INSTANCE.getLogger().log(Level.WARNING, Message.FAILEDCONNECTSQL.getString(), e);
-		}
-	}
-
-	protected void createTablePosters() {
-		String sql = String.format(
-				"CREATE TABLE IF NOT EXISTS `%s` ( `uuid` char(36) NOT NULL, `name` varchar(255) NOT NULL, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `binddate` bigint(0) NOT NULL, `rewardbefore` char(10) NOT NULL, `rewardtimes` int(0) NOT NULL, PRIMARY KEY (`uuid`) );",
-				getTableName("posters"));
-		try (Statement stmt = connection.createStatement()) {
-			stmt.execute(sql);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	protected void createTableTopStates() {
-		String sql = String.format(
-				"CREATE TABLE IF NOT EXISTS `%s` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `bbsname` varchar(255) NOT NULL COLLATE NOCASE, `time` varchar(16) NOT NULL);",
-				getTableName("topstates"));
-		try (Statement stmt = connection.createStatement()) {
-			stmt.execute(sql);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 }
